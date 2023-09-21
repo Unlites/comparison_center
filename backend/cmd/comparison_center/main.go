@@ -2,7 +2,8 @@ package main
 
 import (
 	"context"
-	"log"
+	"log/slog"
+	"os"
 
 	"github.com/Unlites/backend/comparison_center/config"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -12,20 +13,20 @@ import (
 func main() {
 	cfg, err := config.NewConfig()
 	if err != nil {
-		log.Fatalf("failed to init config: %v", err)
+		slog.Error("failed to init config", "detail", err)
+		os.Exit(1)
 	}
 
 	ctx := context.Background()
 
-	log.Fatal(cfg.MongoURI)
-
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(cfg.MongoURI))
 	if err != nil {
-		log.Fatalf("failed to connect to mongodb: %v", err)
+		slog.Error("failed to connect to mongodb", "detail", err)
+		os.Exit(1)
 	}
 
 	if err := client.Ping(ctx, nil); err != nil {
-		log.Fatal(err)
+		slog.Error(err.Error())
 	}
 
 }
