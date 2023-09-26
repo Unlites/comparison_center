@@ -22,12 +22,12 @@ type ComparisonUsecase interface {
 	GetComparisons(ctx context.Context, filter *ComparisonFilter) ([]*Comparison, error)
 	GetComparisonById(ctx context.Context, id string) (*Comparison, error)
 	UpdateComparison(ctx context.Context, id string, comparison *Comparison) error
-	CreateComparison(ctx context.Context, comparison *Comparison) (*Comparison, error)
+	CreateComparison(ctx context.Context, comparison *Comparison) error
 }
 
 type ComparisonRepository interface {
 	GetComparisons(ctx context.Context, filter *ComparisonFilter) ([]*Comparison, error)
 	GetComparisonById(ctx context.Context, id string) (*Comparison, error)
 	UpdateComparison(ctx context.Context, comparison *Comparison) error
-	CreateComparison(ctx context.Context, comparison *Comparison) (*Comparison, error)
+	CreateComparison(ctx context.Context, comparison *Comparison) error
 }

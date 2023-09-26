@@ -18,12 +18,12 @@ type CustomOptionUsecase interface {
 	GetCustomOptions(ctx context.Context, filter *CustomOptionFilter) ([]*CustomOption, error)
 	GetCustomOptionById(ctx context.Context, id string) (*CustomOption, error)
 	UpdateCustomOption(ctx context.Context, id string, customOption *CustomOption) error
-	CreateCustomOption(ctx context.Context, customOption *CustomOption) (*CustomOption, error)
+	CreateCustomOption(ctx context.Context, customOption *CustomOption) error
 }
 
 type CustomOptionRepository interface {
 	GetCustomOptions(ctx context.Context, filter *CustomOptionFilter) ([]*CustomOption, error)
 	GetCustomOptionById(ctx context.Context, id string) (*CustomOption, error)
 	UpdateCustomOption(ctx context.Context, customOption *CustomOption) error
-	CreateCustomOption(ctx context.Context, customOption *CustomOption) (*CustomOption, error)
+	CreateCustomOption(ctx context.Context, customOption *CustomOption) error
 }
