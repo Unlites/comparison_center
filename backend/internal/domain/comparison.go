@@ -13,8 +13,9 @@ type Comparison struct {
 }
 
 type ComparisonFilter struct {
-	Limit  int
-	Offset int
+	Limit   int
+	Offset  int
+	OrderBy int
 }
 
 type ComparisonUsecase interface {
