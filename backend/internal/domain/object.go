@@ -31,3 +31,10 @@ type ObjectUsecase interface {
 	UpdateObject(ctx context.Context, id string, object *Object) error
 	CreateObject(ctx context.Context, object *Object) (*Object, error)
 }
+
+type ObjectRepository interface {
+	GetObjects(ctx context.Context, filter *ObjectFilter) ([]*Object, error)
+	GetObjectById(ctx context.Context, id string) (*Object, error)
+	UpdateObject(ctx context.Context, object *Object) error
+	CreateObject(ctx context.Context, object *Object) (*Object, error)
+}
