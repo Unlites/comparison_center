@@ -3,9 +3,8 @@ package domain
 import "context"
 
 type CustomOption struct {
-	Id    string
-	Name  string
-	Value string
+	Id   string
+	Name string
 }
 
 type CustomOptionFilter struct {
@@ -19,6 +18,7 @@ type CustomOptionUsecase interface {
 	GetCustomOptionById(ctx context.Context, id string) (*CustomOption, error)
 	UpdateCustomOption(ctx context.Context, id string, customOption *CustomOption) error
 	CreateCustomOption(ctx context.Context, customOption *CustomOption) error
+	DeleteCustomOption(ctx context.Context, id string) error
 }
 
 type CustomOptionRepository interface {
@@ -26,4 +26,5 @@ type CustomOptionRepository interface {
 	GetCustomOptionById(ctx context.Context, id string) (*CustomOption, error)
 	UpdateCustomOption(ctx context.Context, customOption *CustomOption) error
 	CreateCustomOption(ctx context.Context, customOption *CustomOption) error
+	DeleteCustomOption(ctx context.Context, id string) error
 }

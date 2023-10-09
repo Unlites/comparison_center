@@ -9,9 +9,9 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/Unlites/backend/comparison_center/config"
-	ch "github.com/Unlites/backend/comparison_center/internal/comparison/delivery/http/v1"
-	chirouter "github.com/Unlites/backend/comparison_center/pkg/router/chi"
+	"github.com/Unlites/comparison_center/backend/config"
+	ch "github.com/Unlites/comparison_center/backend/internal/comparison/delivery/http/v1"
+	chirouter "github.com/Unlites/comparison_center/backend/pkg/router/chi"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )

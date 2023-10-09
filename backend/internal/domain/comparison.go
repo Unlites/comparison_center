@@ -23,6 +23,7 @@ type ComparisonUsecase interface {
 	GetComparisonById(ctx context.Context, id string) (*Comparison, error)
 	UpdateComparison(ctx context.Context, id string, comparison *Comparison) error
 	CreateComparison(ctx context.Context, comparison *Comparison) error
+	DeleteComparison(ctx context.Context, id string) error
 }
 
 type ComparisonRepository interface {
@@ -30,4 +31,5 @@ type ComparisonRepository interface {
 	GetComparisonById(ctx context.Context, id string) (*Comparison, error)
 	UpdateComparison(ctx context.Context, comparison *Comparison) error
 	CreateComparison(ctx context.Context, comparison *Comparison) error
+	DeleteComparison(ctx context.Context, id string) error
 }

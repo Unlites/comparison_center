@@ -6,23 +6,22 @@ import (
 )
 
 type Object struct {
-	Id            string
-	Name          string
-	Rating        int
-	CreatedAt     time.Time
-	Advs          string
-	Disadvs       string
-	PhotoPath     string
-	ComparisonId  string
-	CustomOptions []*CustomOption
+	Id                  string
+	Name                string
+	Rating              int
+	CreatedAt           time.Time
+	Advs                string
+	Disadvs             string
+	PhotoPath           string
+	ComparisonId        string
+	ObjectCustomOptions []*ObjectCustomOption
 }
 
 type ObjectFilter struct {
-	Limit        int
-	Offset       int
-	OrderBy      string
-	Name         string
-	CustomOption CustomOption
+	Limit   int
+	Offset  int
+	OrderBy string
+	Name    string
 }
 
 type ObjectUsecase interface {
@@ -30,6 +29,7 @@ type ObjectUsecase interface {
 	GetObjectById(ctx context.Context, id string) (*Object, error)
 	UpdateObject(ctx context.Context, id string, object *Object) error
 	CreateObject(ctx context.Context, object *Object) error
+	DeleteObject(ctx context.Context, id string) error
 }
 
 type ObjectRepository interface {
@@ -37,4 +37,5 @@ type ObjectRepository interface {
 	GetObjectById(ctx context.Context, id string) (*Object, error)
 	UpdateObject(ctx context.Context, object *Object) error
 	CreateObject(ctx context.Context, object *Object) error
+	DeleteObject(ctx context.Context, id string) error
 }
