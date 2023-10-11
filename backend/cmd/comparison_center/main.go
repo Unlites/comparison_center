@@ -11,7 +11,9 @@ import (
 
 	"github.com/Unlites/comparison_center/backend/config"
 	ch "github.com/Unlites/comparison_center/backend/internal/comparison/delivery/http/v1"
-	chirouter "github.com/Unlites/comparison_center/backend/pkg/router/chi"
+	cr "github.com/Unlites/comparison_center/backend/internal/comparison/repository"
+	cu "github.com/Unlites/comparison_center/backend/internal/comparison/usecase"
+	r "github.com/Unlites/comparison_center/backend/pkg/router"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -35,9 +37,11 @@ func main() {
 		slog.ErrorContext(ctx, "failed to ping mongo", "detail", err)
 	}
 
-	comparisonHandler := ch.NewComparisonHandler()
+	comparisonRepository := cr.NewComparisonRepositoryMongo(client)
+	comparisonUsecase := cu.NewComparisonUsecase(comparisonRepository)
+	comparisonHandler := ch.NewComparisonHandler(comparisonUsecase)
 
-	router := chirouter.NewDefaultRouter()
+	router := r.NewDefaultRouter()
 	router.RegisterHandlers("v1", map[string]http.Handler{
 		"comparison": comparisonHandler.Router,
 	})

@@ -2,6 +2,8 @@ package domain
 
 import (
 	"context"
+	"fmt"
+	"slices"
 	"time"
 )
 
@@ -15,7 +17,33 @@ type Comparison struct {
 type ComparisonFilter struct {
 	Limit   int
 	Offset  int
-	OrderBy int
+	OrderBy string
+}
+
+func NewComparisonFilter(limit, offset int, orderBy string) (*ComparisonFilter, error) {
+	if offset < 0 || limit < 0 {
+		return nil, fmt.Errorf("offset amd limit must not be less than zero")
+	}
+
+	if limit == 0 {
+		limit = 10
+	}
+
+	if orderBy == "" {
+		orderBy = "date"
+	}
+
+	providedOrderings := []string{"date"}
+
+	if !slices.Contains(providedOrderings, orderBy) {
+		return nil, fmt.Errorf("incorrect ordering value")
+	}
+
+	return &ComparisonFilter{
+		Limit:   limit,
+		Offset:  offset,
+		OrderBy: orderBy,
+	}, nil
 }
 
 type ComparisonUsecase interface {
