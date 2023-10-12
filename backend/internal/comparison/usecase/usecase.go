@@ -45,7 +45,14 @@ func (uc *comparisonUsecase) UpdateComparison(
 	id string,
 	comparison *domain.Comparison,
 ) error {
-	comparison.Id = id
+	existingComparison, err := uc.repo.GetComparisonById(ctx, id)
+	if err != nil {
+		return fmt.Errorf("failed to get existing comparison - %w", err)
+	}
+
+	comparison.Id = existingComparison.Id
+	comparison.CreatedAt = existingComparison.CreatedAt
+
 	if err := uc.repo.UpdateComparison(ctx, comparison); err != nil {
 		return fmt.Errorf("failed to update comparison - %w", err)
 	}

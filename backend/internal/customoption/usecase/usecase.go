@@ -49,9 +49,7 @@ func (uc *customOptionUsecase) UpdateCustomOption(
 		return fmt.Errorf("failed to get existing custom option - %w", err)
 	}
 
-	if existingCustomOption == nil {
-		return fmt.Errorf("existing custom option %w", domain.ErrNotFound)
-	}
+	customOption.Id = existingCustomOption.Id
 
 	if err := uc.repo.UpdateCustomOption(ctx, customOption); err != nil {
 		return fmt.Errorf("failed to update custom option - %w", err)

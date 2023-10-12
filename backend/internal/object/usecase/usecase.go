@@ -2,8 +2,8 @@ package usecase
 
 import (
 	"context"
-	"errors"
 	"fmt"
+	"slices"
 
 	"github.com/Unlites/comparison_center/backend/internal/domain"
 )
@@ -70,25 +70,29 @@ func (uc *objectUsecase) UpdateObject(
 		return fmt.Errorf("failed to get existing object - %w", err)
 	}
 
+	inputObject.Id = existingObject.Id
+	inputObject.CreatedAt = existingObject.CreatedAt
+	inputObject.ComparisonId = existingObject.ComparisonId
+
 	if err := uc.objRepo.UpdateObject(ctx, inputObject); err != nil {
 		return fmt.Errorf("failed to update object - %w", err)
 	}
 
-	for _, option := range inputObject.ObjectCustomOptions {
-		existingObjectOption, err := uc.custOptObjRepo.GetObjectCustomOptionsByObjectId(ctx, existingObject.Id)
-		if err != nil && !errors.Is(err, domain.ErrNotFound) {
-			return fmt.Errorf("failed to get existing custom option - %w", err)
-		}
+	existingObjectOptions, err := uc.custOptObjRepo.GetObjectCustomOptionsByObjectId(ctx, existingObject.Id)
+	if err != nil {
+		return fmt.Errorf("failed to get existing custom options - %w", err)
+	}
 
-		if existingObjectOption == nil {
-			err := uc.custOptObjRepo.AddObjectCustomOption(ctx, option)
-			if err != nil {
-				return fmt.Errorf("failed to add custom option - %w", err)
-			}
-		} else {
+	for _, option := range inputObject.ObjectCustomOptions {
+		if slices.Contains(existingObjectOptions, option) {
 			err := uc.custOptObjRepo.UpdateObjectCustomOption(ctx, option)
 			if err != nil {
 				return fmt.Errorf("failed to update custom option - %w", err)
+			}
+		} else {
+			err := uc.custOptObjRepo.AddObjectCustomOption(ctx, option)
+			if err != nil {
+				return fmt.Errorf("failed to add custom option - %w", err)
 			}
 		}
 	}
