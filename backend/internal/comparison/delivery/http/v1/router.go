@@ -69,7 +69,7 @@ func (h *ComparisonHandler) getComparisonById(w http.ResponseWriter, r *http.Req
 
 		httputils.FailureResponse(
 			w, r,
-			fmt.Errorf("get comparisons error - %w", err),
+			fmt.Errorf("get comparison error - %w", err),
 			status,
 		)
 		return
@@ -189,7 +189,7 @@ func (h *ComparisonHandler) deleteComparison(w http.ResponseWriter, r *http.Requ
 
 		httputils.FailureResponse(
 			w, r,
-			fmt.Errorf("update comparison error - %w", err),
+			fmt.Errorf("delete comparison error - %w", err),
 			status,
 		)
 		return
