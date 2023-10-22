@@ -1,6 +1,9 @@
 package domain
 
-import "context"
+import (
+	"context"
+	"fmt"
+)
 
 type CustomOption struct {
 	Id   string
@@ -11,6 +14,22 @@ type CustomOptionFilter struct {
 	Limit  int
 	Offset int
 	Name   string
+}
+
+func NewCustomOptionFilter(limit, offset int, name string) (*CustomOptionFilter, error) {
+	if offset < 0 || limit < 0 {
+		return nil, fmt.Errorf("offset amd limit must not be less than zero")
+	}
+
+	if limit == 0 {
+		limit = 10
+	}
+
+	return &CustomOptionFilter{
+		Limit:  limit,
+		Offset: offset,
+		Name:   name,
+	}, nil
 }
 
 type CustomOptionUsecase interface {
