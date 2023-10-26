@@ -16,6 +16,7 @@ type HttpServer struct {
 	WriteTimeout    time.Duration `yaml:"write_timeout"`
 	IdleTimeout     time.Duration `yaml:"idle_timeout"`
 	ShutdownTimeout time.Duration `yaml:"shutdown_timeout"`
+	MaxUploadSizeMB int64         `yaml:"max_upload_size_mb"`
 }
 
 type DB struct {
