@@ -118,3 +118,18 @@ func (uc *objectUsecase) DeleteObject(ctx context.Context, id string) error {
 
 	return nil
 }
+
+func (uc *objectUsecase) SetObjectPhotoPath(ctx context.Context, id, path string) error {
+	object, err := uc.objRepo.GetObjectById(ctx, id)
+	if err != nil {
+		return fmt.Errorf("failed to get object - %w", err)
+	}
+
+	object.PhotoPath = path
+
+	if err := uc.objRepo.UpdateObject(ctx, object); err != nil {
+		return fmt.Errorf("failed to update object - %w", err)
+	}
+
+	return nil
+}

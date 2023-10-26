@@ -330,3 +330,57 @@ func TestDeleteObject(t *testing.T) {
 		objRepo.AssertExpectations(t)
 	})
 }
+
+func TestSetObjectPhotoPath(t *testing.T) {
+	t.Run("Success", func(t *testing.T) {
+		object := &domain.Object{
+			Id:           "231934sadas9123deqw",
+			Name:         "BMW X5",
+			Rating:       8,
+			CreatedAt:    time.Now(),
+			Advs:         "Good SUV",
+			Disadvs:      "Hard to find some details",
+			ComparisonId: "85434230werhuhi123912304",
+			ObjectCustomOptions: []*domain.ObjectCustomOption{
+				{
+					ObjectId:       "231934sadas9123deqw",
+					CustomOptionId: "432230ewrew3424rwe",
+					Value:          "600",
+				},
+			},
+		}
+		id := "92133easd123srewr132"
+		path := "/photos/4324123sfnjsadn1239213.jpg"
+
+		objRepo := or.NewObjectRepositoryMock()
+		custOptObjRepo := cr.NewObjectCustomOptionRepositoryMock()
+		uc := NewObjectUsecase(objRepo, custOptObjRepo)
+		ctx := context.Background()
+
+		objRepo.On("GetObjectById", ctx, id).Return(object, nil)
+		objRepo.On("UpdateObject", ctx, object).Return(nil)
+
+		err := uc.SetObjectPhotoPath(ctx, id, path)
+
+		assert.NoError(t, err)
+		objRepo.AssertExpectations(t)
+	})
+
+	t.Run("Error", func(t *testing.T) {
+		id := "231934sadas9123deqw"
+		path := "/photos/4324123sfnjsadn1239213.jpg"
+
+		objRepo := or.NewObjectRepositoryMock()
+		custOptObjRepo := cr.NewObjectCustomOptionRepositoryMock()
+		uc := NewObjectUsecase(objRepo, custOptObjRepo)
+		ctx := context.Background()
+
+		objRepo.On("GetObjectById", ctx, id).Return(nil, errors.New("some error"))
+
+		err := uc.SetObjectPhotoPath(ctx, id, path)
+
+		assert.Error(t, err)
+		custOptObjRepo.AssertNotCalled(t, "GetObjectCustomOptionsByObjectId")
+		objRepo.AssertNotCalled(t, "UpdateObject")
+	})
+}
