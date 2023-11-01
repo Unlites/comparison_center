@@ -12,6 +12,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	v "github.com/go-ozzo/ozzo-validation"
+	"github.com/go-ozzo/ozzo-validation/is"
 )
 
 type ComparisonHandler struct {
@@ -79,12 +80,14 @@ func (h *ComparisonHandler) getComparisonById(w http.ResponseWriter, r *http.Req
 }
 
 type createComparisonInput struct {
-	Name string `json:"name"`
+	Name            string   `json:"name"`
+	CustomOptionIds []string `json:"custom_option_ids"`
 }
 
 func (ci *createComparisonInput) Bind(r *http.Request) error {
 	return v.ValidateStruct(ci,
 		v.Field(&ci.Name, v.Required, v.Length(1, 50)),
+		v.Field(&ci.CustomOptionIds, v.Each(is.UUIDv4)),
 	)
 }
 
@@ -108,12 +111,21 @@ func (h *ComparisonHandler) createComparison(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	err := h.uc.CreateComparison(r.Context(), &domain.Comparison{Name: input.Name})
+	err := h.uc.CreateComparison(r.Context(), &domain.Comparison{
+		Name:            input.Name,
+		CustomOptionIds: input.CustomOptionIds,
+	})
 	if err != nil {
+		status := http.StatusInternalServerError
+
+		if errors.Is(err, domain.ErrAlreadyExists) {
+			status = http.StatusBadRequest
+		}
+
 		httputils.FailureResponse(
 			w, r,
 			fmt.Errorf("create comparison error - %w", err),
-			http.StatusInternalServerError,
+			status,
 		)
 		return
 	}

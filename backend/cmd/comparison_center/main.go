@@ -43,7 +43,7 @@ func main() {
 
 	router := r.NewDefaultRouter()
 	router.RegisterHandlers("v1", map[string]http.Handler{
-		"comparison": comparisonHandler.Router,
+		"comparisons": comparisonHandler.Router,
 	})
 
 	srv := &http.Server{

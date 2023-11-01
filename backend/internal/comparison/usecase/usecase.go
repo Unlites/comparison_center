@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/Unlites/comparison_center/backend/internal/domain"
+	"github.com/google/uuid"
 )
 
 type comparisonUsecase struct {
@@ -64,6 +65,7 @@ func (uc *comparisonUsecase) CreateComparison(
 	ctx context.Context,
 	comparison *domain.Comparison,
 ) error {
+	comparison.Id = uuid.NewString()
 	comparison.CreatedAt = time.Now()
 
 	if err := uc.repo.CreateComparison(ctx, comparison); err != nil {
