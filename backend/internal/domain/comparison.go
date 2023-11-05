@@ -30,10 +30,10 @@ func NewComparisonFilter(limit, offset int, orderBy string) (*ComparisonFilter, 
 	}
 
 	if orderBy == "" {
-		orderBy = "date"
+		orderBy = "created_at"
 	}
 
-	providedOrderings := []string{"date"}
+	providedOrderings := []string{"created_at"}
 
 	if !slices.Contains(providedOrderings, orderBy) {
 		return nil, fmt.Errorf("incorrect ordering value")
