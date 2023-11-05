@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log/slog"
 	"time"
 
 	"github.com/Unlites/comparison_center/backend/internal/domain"
@@ -143,7 +142,6 @@ func (repo *comparisonRepositoryMongo) DeleteComparison(
 }
 
 func toComparisonMongo(domainComparison *domain.Comparison) *comparisonMongo {
-	slog.Info(fmt.Sprintf("%v", domainComparison))
 	return &comparisonMongo{
 		Id:              domainComparison.Id,
 		Name:            domainComparison.Name,
