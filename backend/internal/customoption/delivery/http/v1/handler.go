@@ -32,6 +32,11 @@ func NewCustomOptionHandler(uc domain.CustomOptionUsecase) *CustomOptionHandler 
 	return handler
 }
 
+type customOptionResponse struct {
+	Id   string `json:"id"`
+	Name string `json:"name"`
+}
+
 func (h *CustomOptionHandler) getCustomOptions(w http.ResponseWriter, r *http.Request) {
 	filter, err := h.getFilter(r.URL.Query())
 	if err != nil {
@@ -53,7 +58,12 @@ func (h *CustomOptionHandler) getCustomOptions(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	httputils.SuccessResponse(w, r, customOptions)
+	customOptionResponses := make([]*customOptionResponse, len(customOptions))
+	for i, co := range customOptions {
+		customOptionResponses[i] = toCustomOptionResponse(co)
+	}
+
+	httputils.SuccessResponse(w, r, customOptionResponses)
 }
 
 func (h *CustomOptionHandler) getCustomOptionById(w http.ResponseWriter, r *http.Request) {
@@ -75,7 +85,7 @@ func (h *CustomOptionHandler) getCustomOptionById(w http.ResponseWriter, r *http
 		return
 	}
 
-	httputils.SuccessResponse(w, r, customOption)
+	httputils.SuccessResponse(w, r, toCustomOptionResponse(customOption))
 }
 
 type createCustomOptionInput struct {
@@ -221,4 +231,11 @@ func (h *CustomOptionHandler) getFilter(params url.Values) (*domain.CustomOption
 	name = params.Get("name")
 
 	return domain.NewCustomOptionFilter(limit, offset, name)
+}
+
+func toCustomOptionResponse(customOption *domain.CustomOption) *customOptionResponse {
+	return &customOptionResponse{
+		Id:   customOption.Id,
+		Name: customOption.Name,
+	}
 }

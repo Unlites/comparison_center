@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/Unlites/comparison_center/backend/internal/domain"
+	"github.com/google/uuid"
 )
 
 type customOptionUsecase struct {
@@ -62,6 +63,7 @@ func (uc *customOptionUsecase) CreateCustomOption(
 	ctx context.Context,
 	customOption *domain.CustomOption,
 ) error {
+	customOption.Id = uuid.NewString()
 	if err := uc.repo.CreateCustomOption(ctx, customOption); err != nil {
 		return fmt.Errorf("failed to create custom option - %w", err)
 	}

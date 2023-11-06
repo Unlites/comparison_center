@@ -13,6 +13,9 @@ import (
 	ch "github.com/Unlites/comparison_center/backend/internal/comparison/delivery/http/v1"
 	cr "github.com/Unlites/comparison_center/backend/internal/comparison/repository"
 	cu "github.com/Unlites/comparison_center/backend/internal/comparison/usecase"
+	coh "github.com/Unlites/comparison_center/backend/internal/customoption/delivery/http/v1"
+	cor "github.com/Unlites/comparison_center/backend/internal/customoption/repository"
+	cou "github.com/Unlites/comparison_center/backend/internal/customoption/usecase"
 	r "github.com/Unlites/comparison_center/backend/pkg/router"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -35,15 +38,21 @@ func main() {
 
 	if err := client.Ping(ctx, nil); err != nil {
 		slog.ErrorContext(ctx, "failed to ping mongo", "detail", err)
+		os.Exit(1)
 	}
 
 	comparisonRepository := cr.NewComparisonRepositoryMongo(client)
 	comparisonUsecase := cu.NewComparisonUsecase(comparisonRepository)
 	comparisonHandler := ch.NewComparisonHandler(comparisonUsecase)
 
+	customOptionRepository := cor.NewCustomOptionRepositoryMongo(client)
+	customOptionUsecase := cou.NewCustomOptionUsecase(customOptionRepository)
+	customOptionHandler := coh.NewCustomOptionHandler(customOptionUsecase)
+
 	router := r.NewDefaultRouter()
 	router.RegisterHandlers("v1", map[string]http.Handler{
-		"comparisons": comparisonHandler.Router,
+		"comparisons":    comparisonHandler.Router,
+		"custom_options": customOptionHandler.Router,
 	})
 
 	srv := &http.Server{
