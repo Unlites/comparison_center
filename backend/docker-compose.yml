@@ -23,3 +23,4 @@ services:
       - .mongo_db:/data/db
     ports:
       - ${MONGODB_HOSTPORT}:27017
+    restart: always
