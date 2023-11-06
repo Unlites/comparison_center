@@ -150,11 +150,11 @@ func toComparisonMongo(domainComparison *domain.Comparison) *comparisonMongo {
 	}
 }
 
-func toDomainComparison(comparisonMongo *comparisonMongo) *domain.Comparison {
+func toDomainComparison(cm *comparisonMongo) *domain.Comparison {
 	return &domain.Comparison{
-		Id:              comparisonMongo.Id,
-		Name:            comparisonMongo.Name,
-		CreatedAt:       comparisonMongo.CreatedAt,
-		CustomOptionIds: comparisonMongo.CustomOptionIds,
+		Id:              cm.Id,
+		Name:            cm.Name,
+		CreatedAt:       cm.CreatedAt,
+		CustomOptionIds: cm.CustomOptionIds,
 	}
 }

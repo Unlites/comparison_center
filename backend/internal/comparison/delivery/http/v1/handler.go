@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+	"time"
 
 	"github.com/Unlites/comparison_center/backend/internal/domain"
 	httputils "github.com/Unlites/comparison_center/backend/internal/utils/http"
@@ -33,6 +34,13 @@ func NewComparisonHandler(uc domain.ComparisonUsecase) *ComparisonHandler {
 	return handler
 }
 
+type comparisonResponse struct {
+	Id              string    `json:"id"`
+	Name            string    `json:"name"`
+	CreatedAt       time.Time `json:"created_at"`
+	CustomOptionIds []string  `json:"custom_options_id"`
+}
+
 func (h *ComparisonHandler) getComparisons(w http.ResponseWriter, r *http.Request) {
 	filter, err := h.getFilter(r.URL.Query())
 	if err != nil {
@@ -54,7 +62,12 @@ func (h *ComparisonHandler) getComparisons(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	httputils.SuccessResponse(w, r, comparisons)
+	comparisonResponses := make([]*comparisonResponse, len(comparisons))
+	for i, c := range comparisons {
+		comparisonResponses[i] = toComparisonResponse(c)
+	}
+
+	httputils.SuccessResponse(w, r, comparisonResponses)
 }
 
 func (h *ComparisonHandler) getComparisonById(w http.ResponseWriter, r *http.Request) {
@@ -76,7 +89,7 @@ func (h *ComparisonHandler) getComparisonById(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	httputils.SuccessResponse(w, r, comparison)
+	httputils.SuccessResponse(w, r, toComparisonResponse(comparison))
 }
 
 type createComparisonInput struct {
@@ -236,4 +249,13 @@ func (h *ComparisonHandler) getFilter(params url.Values) (*domain.ComparisonFilt
 	orderBy = params.Get("order_by")
 
 	return domain.NewComparisonFilter(limit, offset, orderBy)
+}
+
+func toComparisonResponse(comparison *domain.Comparison) *comparisonResponse {
+	return &comparisonResponse{
+		Id:              comparison.Id,
+		Name:            comparison.Name,
+		CreatedAt:       comparison.CreatedAt,
+		CustomOptionIds: comparison.CustomOptionIds,
+	}
 }
