@@ -16,6 +16,10 @@ import (
 	coh "github.com/Unlites/comparison_center/backend/internal/customoption/delivery/http/v1"
 	cor "github.com/Unlites/comparison_center/backend/internal/customoption/repository"
 	cou "github.com/Unlites/comparison_center/backend/internal/customoption/usecase"
+	oh "github.com/Unlites/comparison_center/backend/internal/object/delivery/http/v1"
+	or "github.com/Unlites/comparison_center/backend/internal/object/repository"
+	ou "github.com/Unlites/comparison_center/backend/internal/object/usecase"
+	ocor "github.com/Unlites/comparison_center/backend/internal/object_customoption/repository"
 	r "github.com/Unlites/comparison_center/backend/pkg/router"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -49,10 +53,16 @@ func main() {
 	customOptionUsecase := cou.NewCustomOptionUsecase(customOptionRepository)
 	customOptionHandler := coh.NewCustomOptionHandler(customOptionUsecase)
 
+	objectRepository := or.NewObjectRepositoryMongo(client)
+	objectCustomOptionRepository := ocor.NewObjectCustomOptionRepositoryMongo(client)
+	objectUsecase := ou.NewObjectUsecase(objectRepository, objectCustomOptionRepository)
+	objectHandler := oh.NewObjectHandler(objectUsecase, cfg.PhotosDir, cfg.MaxUploadSizeMB)
+
 	router := r.NewDefaultRouter()
 	router.RegisterHandlers("v1", map[string]http.Handler{
 		"comparisons":    comparisonHandler.Router,
 		"custom_options": customOptionHandler.Router,
+		"objects":        objectHandler.Router,
 	})
 
 	srv := &http.Server{

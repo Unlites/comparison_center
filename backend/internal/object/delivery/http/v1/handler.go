@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"time"
 
 	"github.com/Unlites/comparison_center/backend/internal/domain"
 	httputils "github.com/Unlites/comparison_center/backend/internal/utils/http"
@@ -26,11 +27,12 @@ type ObjectHandler struct {
 	uc            domain.ObjectUsecase
 }
 
-func NewObjectHandler(uc domain.ObjectUsecase, maxSize int64) *ObjectHandler {
+func NewObjectHandler(uc domain.ObjectUsecase, photosDir string, maxSize int64) *ObjectHandler {
 	router := chi.NewRouter()
 	handler := &ObjectHandler{
 		Router:        router,
 		MaxUploadSize: maxSize << 20,
+		PhotosDir:     photosDir,
 		uc:            uc,
 	}
 
@@ -44,6 +46,17 @@ func NewObjectHandler(uc domain.ObjectUsecase, maxSize int64) *ObjectHandler {
 	router.Post("/{id}/photo", handler.uploadObjectPhoto)
 
 	return handler
+}
+
+type objectResponse struct {
+	Id            string              `json:"id"`
+	Name          string              `json:"name"`
+	Rating        int                 `json:"rating"`
+	CreatedAt     time.Time           `json:"created_at"`
+	Advs          string              `json:"advs"`
+	Disadvs       string              `json:"disadvs"`
+	ComparisonId  string              `json:"comparison_id"`
+	CustomOptions []map[string]string `json:"custom_options"`
 }
 
 func (h *ObjectHandler) getObjects(w http.ResponseWriter, r *http.Request) {
@@ -67,7 +80,12 @@ func (h *ObjectHandler) getObjects(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	httputils.SuccessResponse(w, r, objects)
+	objectResponses := make([]*objectResponse, len(objects))
+	for i, o := range objects {
+		objectResponses[i] = toObjectResponse(o)
+	}
+
+	httputils.SuccessResponse(w, r, objectResponses)
 }
 
 func (h *ObjectHandler) getObjectById(w http.ResponseWriter, r *http.Request) {
@@ -89,7 +107,7 @@ func (h *ObjectHandler) getObjectById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	httputils.SuccessResponse(w, r, object)
+	httputils.SuccessResponse(w, r, toObjectResponse(object))
 }
 
 type createObjectInput struct {
@@ -131,7 +149,11 @@ func (h *ObjectHandler) createObject(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err := h.uc.CreateObject(r.Context(), &domain.Object{
-		Name: input.Name,
+		Name:         input.Name,
+		Rating:       input.Rating,
+		Advs:         input.Advs,
+		Disadvs:      input.Disadvs,
+		ComparisonId: input.ComparisonId,
 	})
 	if err != nil {
 		httputils.FailureResponse(
@@ -188,8 +210,21 @@ func (h *ObjectHandler) updateObject(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	objCustOpts := make([]*domain.ObjectCustomOption, len(input.CustomOptions))
+	for i, opt := range input.CustomOptions {
+		objCustOpts[i] = &domain.ObjectCustomOption{
+			ObjectId:       id,
+			CustomOptionId: opt["id"],
+			Value:          opt["value"],
+		}
+	}
+
 	err := h.uc.UpdateObject(r.Context(), id, &domain.Object{
-		Name: input.Name,
+		Name:                input.Name,
+		Rating:              input.Rating,
+		Advs:                input.Advs,
+		Disadvs:             input.Disadvs,
+		ObjectCustomOptions: objCustOpts,
 	})
 	if err != nil {
 		status := http.StatusInternalServerError
@@ -399,4 +434,24 @@ func (h *ObjectHandler) getFilter(params url.Values) (*domain.ObjectFilter, erro
 	name = params.Get("name")
 
 	return domain.NewObjectFilter(limit, offset, orderBy, name)
+}
+
+func toObjectResponse(object *domain.Object) *objectResponse {
+	customOpts := make([]map[string]string, len(object.ObjectCustomOptions))
+	for i, co := range object.ObjectCustomOptions {
+		customOpts[i] = map[string]string{
+			"id":    co.CustomOptionId,
+			"value": co.Value,
+		}
+	}
+	return &objectResponse{
+		Id:            object.Id,
+		Name:          object.Name,
+		Rating:        object.Rating,
+		CreatedAt:     object.CreatedAt,
+		Advs:          object.Advs,
+		Disadvs:       object.Disadvs,
+		ComparisonId:  object.ComparisonId,
+		CustomOptions: customOpts,
+	}
 }

@@ -4,8 +4,10 @@ import (
 	"context"
 	"fmt"
 	"slices"
+	"time"
 
 	"github.com/Unlites/comparison_center/backend/internal/domain"
+	"github.com/google/uuid"
 )
 
 type objectUsecase struct {
@@ -104,6 +106,8 @@ func (uc *objectUsecase) CreateObject(
 	ctx context.Context,
 	object *domain.Object,
 ) error {
+	object.Id = uuid.NewString()
+	object.CreatedAt = time.Now()
 	if err := uc.objRepo.CreateObject(ctx, object); err != nil {
 		return fmt.Errorf("failed to create object - %w", err)
 	}

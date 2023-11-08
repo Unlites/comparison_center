@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log/slog"
 
 	"github.com/Unlites/comparison_center/backend/internal/domain"
 	"go.mongodb.org/mongo-driver/bson"
@@ -89,8 +88,6 @@ func (repo *customOptionRepositoryMongo) GetCustomOptions(
 	if filter.Name != "" {
 		condition["name"] = bson.M{"$regex": filter.Name}
 	}
-
-	slog.Info(fmt.Sprintf("%v", condition))
 
 	cur, err := repo.customOptionsColl.Find(ctx, condition, opts)
 	if err != nil {

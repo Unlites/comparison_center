@@ -35,7 +35,11 @@ func NewObjectFilter(limit, offset int, orderBy, name string) (*ObjectFilter, er
 		limit = 10
 	}
 
-	providedOrderings := []string{"date", "name", "rating"}
+	if orderBy == "" {
+		orderBy = "created_at"
+	}
+
+	providedOrderings := []string{"created_at", "name", "rating"}
 
 	if !slices.Contains(providedOrderings, orderBy) {
 		return nil, fmt.Errorf("incorrect ordering value")

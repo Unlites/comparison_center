@@ -154,7 +154,7 @@ type updateComparisonInput struct {
 func (ci *updateComparisonInput) Bind(r *http.Request) error {
 	return v.ValidateStruct(ci,
 		v.Field(&ci.Name, v.Required, v.Length(1, 50)),
-		v.Field(&ci.CustomOptionIds, v.Required),
+		v.Field(&ci.CustomOptionIds, v.Each(is.UUIDv4)),
 	)
 }
 
