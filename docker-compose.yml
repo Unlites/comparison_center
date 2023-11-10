@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  app:
+    container_name: comparison_center_app
+    build: ./backend/
+    env_file:
+      - .env
+    volumes:
+      - ./backend:/app
+    ports:
+      - ${APP_HOSTPORT}:8000
+    depends_on:
+      - db
+    restart: always
+
+  db:
+    container_name: comparison_center_mongo_db
+    image: mongo:6.0
+    env_file:
+      - .env
+    volumes:
+      - .mongo_db:/data/db
+    ports:
+      - ${MONGODB_HOSTPORT}:27017
+    restart: always
