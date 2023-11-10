@@ -4,4 +4,4 @@ http_server:
   write_timeout: 10s
   idle_timeout: 60s
   shutdown_timeout: 10s
-  max_upload_size_mb: 10
+  max_upload_size_mb: 20
