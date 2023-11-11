@@ -9,10 +9,13 @@ RUN go mod download
 
 COPY . .
 
-# RUN CGO_ENABLED=0 GOOS=linux go build -ldflags "-s -w" -o /comparison_center ./cmd/comparison_center/main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags "-s -w" -o /migrate ./cmd/migrate/main.go
 
-# FROM scratch
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags "-s -w" -o /comparison_center ./cmd/comparison_center/main.go
 
-# COPY --from=builder comparison_center /bin/comparison_center
+FROM scratch
 
-CMD ["go", "run", "./cmd/comparison_center/main.go"]
+COPY --from=builder migrate /bin/migrate
+COPY --from=builder comparison_center /bin/comparison_center
+
+CMD ["/bin/comparison_center"]
