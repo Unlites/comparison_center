@@ -20,7 +20,8 @@ type HttpServer struct {
 }
 
 type DB struct {
-	MongoURI string `env:"MONGODB_URI" env-required:"true"`
+	MongoURI      string `env:"MONGODB_URI" env-required:"true"`
+	MigrationsDir string `env:"MIGRATIONS_DIR" env-required:"true"`
 }
 
 type Config struct {
