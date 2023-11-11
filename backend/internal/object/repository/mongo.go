@@ -91,23 +91,7 @@ func (repo *objectRepositoryMongo) CreateObject(
 	ctx context.Context,
 	object *domain.Object,
 ) error {
-	err := repo.objectsColl.FindOne(ctx, bson.M{
-		"name": object.Name,
-	}).Err()
-
-	if err == nil {
-		return fmt.Errorf(
-			"object '%s' %w",
-			object.Name,
-			domain.ErrAlreadyExists,
-		)
-	} else {
-		if !errors.Is(err, mongo.ErrNoDocuments) {
-			return fmt.Errorf("check existence of object in mongo error: %w", err)
-		}
-	}
-
-	_, err = repo.objectsColl.InsertOne(ctx, toObjectMongo(object))
+	_, err := repo.objectsColl.InsertOne(ctx, toObjectMongo(object))
 	if err != nil {
 		return fmt.Errorf("insert to mongo error: %w", err)
 	}

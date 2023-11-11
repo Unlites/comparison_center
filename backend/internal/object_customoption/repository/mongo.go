@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
 	"github.com/Unlites/comparison_center/backend/internal/domain"
@@ -16,7 +15,7 @@ type objectCustomOptionRepositoryMongo struct {
 
 func NewObjectCustomOptionRepositoryMongo(client *mongo.Client) *objectCustomOptionRepositoryMongo {
 	return &objectCustomOptionRepositoryMongo{
-		objectCustomOptionsColl: client.Database("database").Collection("custom_options"),
+		objectCustomOptionsColl: client.Database("database").Collection("object_custom_options"),
 	}
 }
 
@@ -52,29 +51,19 @@ func (repo *objectCustomOptionRepositoryMongo) AddObjectCustomOption(
 	ctx context.Context,
 	objectCustomOption *domain.ObjectCustomOption,
 ) error {
-	err := repo.objectCustomOptionsColl.FindOne(ctx, bson.M{
-		"object_id":        objectCustomOption.ObjectId,
-		"custom_option_id": objectCustomOption.CustomOptionId,
-	}).Err()
-
-	if err == nil {
-		return fmt.Errorf(
-			"option with object id '%s' and custom option id '%s' %w",
-			objectCustomOption.ObjectId,
-			objectCustomOption.CustomOptionId,
-			domain.ErrAlreadyExists,
-		)
-	} else {
-		if !errors.Is(err, mongo.ErrNoDocuments) {
-			return fmt.Errorf("check existence of object custom option in mongo error: %w", err)
-		}
-	}
-
-	_, err = repo.objectCustomOptionsColl.InsertOne(
+	_, err := repo.objectCustomOptionsColl.InsertOne(
 		ctx,
 		toObjectCustomOptionMongo(objectCustomOption),
 	)
 	if err != nil {
+		if mongo.IsDuplicateKeyError(err) {
+			return fmt.Errorf(
+				"option with object id '%s' and custom option id '%s' %w",
+				objectCustomOption.ObjectId,
+				objectCustomOption.CustomOptionId,
+				domain.ErrAlreadyExists,
+			)
+		}
 		return fmt.Errorf("insert to mongo error: %w", err)
 	}
 

@@ -40,11 +40,6 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err := client.Ping(ctx, nil); err != nil {
-		slog.ErrorContext(ctx, "failed to ping mongo", "detail", err)
-		os.Exit(1)
-	}
-
 	comparisonRepository := cr.NewComparisonRepositoryMongo(client)
 	comparisonUsecase := cu.NewComparisonUsecase(comparisonRepository)
 	comparisonHandler := ch.NewComparisonHandler(comparisonUsecase)

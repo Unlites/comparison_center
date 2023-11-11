@@ -87,6 +87,14 @@ func (repo *comparisonRepositoryMongo) UpdateComparison(
 		bson.M{"$set": toComparisonMongo(comparison)},
 	)
 	if err != nil {
+		if mongo.IsDuplicateKeyError(err) {
+			return fmt.Errorf(
+				"comparison with name '%s' %w",
+				comparison.Name,
+				domain.ErrAlreadyExists,
+			)
+		}
+
 		return fmt.Errorf("update at mongo error: %w", err)
 	}
 
@@ -101,24 +109,16 @@ func (repo *comparisonRepositoryMongo) CreateComparison(
 	ctx context.Context,
 	comparison *domain.Comparison,
 ) error {
-	err := repo.comparisonsColl.FindOne(ctx, bson.M{
-		"name": comparison.Name,
-	}).Err()
-
-	if err == nil {
-		return fmt.Errorf(
-			"comparison '%s' %w",
-			comparison.Name,
-			domain.ErrAlreadyExists,
-		)
-	} else {
-		if !errors.Is(err, mongo.ErrNoDocuments) {
-			return fmt.Errorf("check existence of comparison in mongo error: %w", err)
-		}
-	}
-
-	_, err = repo.comparisonsColl.InsertOne(ctx, toComparisonMongo(comparison))
+	_, err := repo.comparisonsColl.InsertOne(ctx, toComparisonMongo(comparison))
 	if err != nil {
+		if mongo.IsDuplicateKeyError(err) {
+			return fmt.Errorf(
+				"comparison with name '%s' %w",
+				comparison.Name,
+				domain.ErrAlreadyExists,
+			)
+		}
+
 		return fmt.Errorf("insert to mongo error: %w", err)
 	}
 

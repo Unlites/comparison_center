@@ -30,24 +30,16 @@ func (repo *customOptionRepositoryMongo) CreateCustomOption(
 	ctx context.Context,
 	customOption *domain.CustomOption,
 ) error {
-	err := repo.customOptionsColl.FindOne(ctx, bson.M{
-		"name": customOption.Name,
-	}).Err()
-
-	if err == nil {
-		return fmt.Errorf(
-			"custom option '%s' %w",
-			customOption.Name,
-			domain.ErrAlreadyExists,
-		)
-	} else {
-		if !errors.Is(err, mongo.ErrNoDocuments) {
-			return fmt.Errorf("check existence of custom option in mongo error: %w", err)
-		}
-	}
-
-	_, err = repo.customOptionsColl.InsertOne(ctx, toCustomOptionMongo(customOption))
+	_, err := repo.customOptionsColl.InsertOne(ctx, toCustomOptionMongo(customOption))
 	if err != nil {
+		if mongo.IsDuplicateKeyError(err) {
+			return fmt.Errorf(
+				"custom option with name '%s' %w",
+				customOption.Name,
+				domain.ErrAlreadyExists,
+			)
+		}
+
 		return fmt.Errorf("insert to mongo error: %w", err)
 	}
 
@@ -117,6 +109,14 @@ func (repo *customOptionRepositoryMongo) UpdateCustomOption(
 		bson.M{"$set": toCustomOptionMongo(customOption)},
 	)
 	if err != nil {
+		if mongo.IsDuplicateKeyError(err) {
+			return fmt.Errorf(
+				"custom option with name '%s' %w",
+				customOption.Name,
+				domain.ErrAlreadyExists,
+			)
+		}
+
 		return fmt.Errorf("update at mongo error: %w", err)
 	}
 

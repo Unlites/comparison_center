@@ -184,6 +184,10 @@ func (h *ComparisonHandler) updateComparison(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
+	if input.CustomOptionIds == nil {
+		input.CustomOptionIds = make([]string, 0)
+	}
+
 	err := h.uc.UpdateComparison(r.Context(), id, &domain.Comparison{
 		Name:            input.Name,
 		CustomOptionIds: input.CustomOptionIds,
