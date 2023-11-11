@@ -1,0 +1,39 @@
+[
+    {
+        "createIndexes": "comparisons",
+        "indexes": [
+            {
+                "key": {
+                    "name": 1
+                },
+                "name": "comparison_name_unique",
+                "unique": true
+            }
+        ]
+    },
+    {
+        "createIndexes": "custom_options",
+        "indexes": [
+            {
+                "key": {
+                    "name": 1
+                },
+                "name": "custom_option_name_unique",
+                "unique": true
+            }
+        ]
+    },
+    {
+        "createIndexes": "object_custom_options",
+        "indexes": [
+            {
+                "key": {
+                    "object_id": 1,
+                    "custom_option_id": 1
+                },
+                "name": "object_custom_option_id_unique",
+                "unique": true
+            }
+        ]
+    }
+]

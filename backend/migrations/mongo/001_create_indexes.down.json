@@ -1,0 +1,14 @@
+[
+    {
+        "dropIndexes": "comparisons",
+        "index": "comparison_name_unique"
+    },
+    {
+        "dropIndexes": "custom_options",
+        "index": "custom_option_name_unique"
+    },
+    {
+        "dropIndexes": "object_custom_options",
+        "index": "object_custom_option_id_unique"
+    }
+]
