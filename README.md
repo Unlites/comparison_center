@@ -6,7 +6,7 @@ Service for centralized and custom comparison of any categories of objects.
 
 ```shell
 git clone https://github.com/Unlites/comparison_center
-make up
+make run
 make migrate
 ```
 
