@@ -20,6 +20,8 @@ type ComparisonFilter struct {
 	OrderBy string
 }
 
+var providedComparisonOrderings = []string{"created_at"}
+
 func NewComparisonFilter(limit, offset int, orderBy string) (*ComparisonFilter, error) {
 	if offset < 0 || limit < 0 {
 		return nil, fmt.Errorf("offset amd limit must not be less than zero")
@@ -33,9 +35,7 @@ func NewComparisonFilter(limit, offset int, orderBy string) (*ComparisonFilter, 
 		orderBy = "created_at"
 	}
 
-	providedOrderings := []string{"created_at"}
-
-	if !slices.Contains(providedOrderings, orderBy) {
+	if !slices.Contains(providedComparisonOrderings, orderBy) {
 		return nil, fmt.Errorf("incorrect ordering value")
 	}
 

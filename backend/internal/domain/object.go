@@ -26,6 +26,8 @@ type ObjectFilter struct {
 	Name    string
 }
 
+var providedObjectOrderings = []string{"created_at", "name", "rating"}
+
 func NewObjectFilter(limit, offset int, orderBy, name string) (*ObjectFilter, error) {
 	if offset < 0 || limit < 0 {
 		return nil, fmt.Errorf("offset amd limit must not be less than zero")
@@ -39,9 +41,7 @@ func NewObjectFilter(limit, offset int, orderBy, name string) (*ObjectFilter, er
 		orderBy = "created_at"
 	}
 
-	providedOrderings := []string{"created_at", "name", "rating"}
-
-	if !slices.Contains(providedOrderings, orderBy) {
+	if !slices.Contains(providedObjectOrderings, orderBy) {
 		return nil, fmt.Errorf("incorrect ordering value")
 	}
 
