@@ -411,6 +411,7 @@ func (h *ObjectHandler) getFilter(params url.Values) (*domain.ObjectFilter, erro
 	var limit int
 	var offset int
 	var name string
+	var comparisonId string
 
 	var err error
 
@@ -432,8 +433,9 @@ func (h *ObjectHandler) getFilter(params url.Values) (*domain.ObjectFilter, erro
 
 	orderBy := params.Get("order_by")
 	name = params.Get("name")
+	comparisonId = params.Get("comparison_id")
 
-	return domain.NewObjectFilter(limit, offset, orderBy, name)
+	return domain.NewObjectFilter(limit, offset, orderBy, name, comparisonId)
 }
 
 func toObjectResponse(object *domain.Object) *objectResponse {

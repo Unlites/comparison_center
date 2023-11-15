@@ -45,7 +45,14 @@ func (repo *objectRepositoryMongo) GetObjects(
 	condition := bson.M{}
 
 	if filter.Name != "" {
-		condition["name"] = bson.M{"$regex": filter.Name}
+		condition["name"] = bson.M{
+			"$regex":   filter.Name,
+			"$options": "i",
+		}
+	}
+
+	if filter.ComparisonId != "" {
+		condition["comparison_id"] = filter.ComparisonId
 	}
 
 	cur, err := repo.objectsColl.Find(ctx, condition, opts)

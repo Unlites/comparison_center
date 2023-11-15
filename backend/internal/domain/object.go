@@ -20,15 +20,16 @@ type Object struct {
 }
 
 type ObjectFilter struct {
-	Limit   int
-	Offset  int
-	OrderBy string
-	Name    string
+	Limit        int
+	Offset       int
+	OrderBy      string
+	Name         string
+	ComparisonId string
 }
 
 var providedObjectOrderings = []string{"created_at", "name", "rating"}
 
-func NewObjectFilter(limit, offset int, orderBy, name string) (*ObjectFilter, error) {
+func NewObjectFilter(limit, offset int, orderBy, name, comparisonId string) (*ObjectFilter, error) {
 	if offset < 0 || limit < 0 {
 		return nil, fmt.Errorf("offset amd limit must not be less than zero")
 	}
