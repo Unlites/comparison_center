@@ -38,7 +38,7 @@ type comparisonResponse struct {
 	Id              string    `json:"id"`
 	Name            string    `json:"name"`
 	CreatedAt       time.Time `json:"created_at"`
-	CustomOptionIds []string  `json:"custom_options_id"`
+	CustomOptionIds []string  `json:"custom_options_ids"`
 }
 
 func (h *ComparisonHandler) getComparisons(w http.ResponseWriter, r *http.Request) {
