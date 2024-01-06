@@ -170,8 +170,9 @@ func TestCreateObject(t *testing.T) {
 
 		objRepo.On("CreateObject", ctx, inputObject).Return(nil)
 
-		err := uc.CreateObject(ctx, inputObject)
+		id, err := uc.CreateObject(ctx, inputObject)
 
+		assert.NotEmpty(t, id)
 		assert.NoError(t, err)
 		objRepo.AssertExpectations(t)
 	})
@@ -195,8 +196,9 @@ func TestCreateObject(t *testing.T) {
 
 		objRepo.On("CreateObject", ctx, inputObject).Return(errors.New("some error"))
 
-		err := uc.CreateObject(ctx, inputObject)
+		id, err := uc.CreateObject(ctx, inputObject)
 
+		assert.Empty(t, id)
 		assert.Error(t, err)
 		objRepo.AssertExpectations(t)
 	})

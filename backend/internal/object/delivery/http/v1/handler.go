@@ -121,11 +121,15 @@ type createObjectInput struct {
 func (oi *createObjectInput) Bind(r *http.Request) error {
 	return v.ValidateStruct(oi,
 		v.Field(&oi.Name, v.Required, v.Length(1, 50)),
-		v.Field(&oi.Rating, v.Min(1), v.Max(10)),
+		v.Field(&oi.Rating, v.Required, v.Min(1), v.Max(10)),
 		v.Field(&oi.Advs, v.Length(1, 3000)),
 		v.Field(&oi.Disadvs, v.Length(1, 3000)),
 		v.Field(&oi.ComparisonId, v.Required, is.UUIDv4),
 	)
+}
+
+type returnedIdResponse struct {
+	Id string `json:"id"`
 }
 
 func (h *ObjectHandler) createObject(w http.ResponseWriter, r *http.Request) {
@@ -148,7 +152,7 @@ func (h *ObjectHandler) createObject(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := h.uc.CreateObject(r.Context(), &domain.Object{
+	id, err := h.uc.CreateObject(r.Context(), &domain.Object{
 		Name:         input.Name,
 		Rating:       input.Rating,
 		Advs:         input.Advs,
@@ -164,7 +168,7 @@ func (h *ObjectHandler) createObject(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	httputils.SuccessResponse(w, r, nil)
+	httputils.SuccessResponse(w, r, &returnedIdResponse{Id: id})
 }
 
 type updateObjectInput struct {
@@ -178,7 +182,7 @@ type updateObjectInput struct {
 func (oi *updateObjectInput) Bind(r *http.Request) error {
 	return v.ValidateStruct(oi,
 		v.Field(&oi.Name, v.Required, v.Length(1, 50)),
-		v.Field(&oi.Rating, v.Min(1), v.Max(10)),
+		v.Field(&oi.Rating, v.Required, v.Min(1), v.Max(10)),
 		v.Field(&oi.Advs, v.Length(1, 3000)),
 		v.Field(&oi.Disadvs, v.Length(1, 3000)),
 		v.Field(&oi.CustomOptions, v.Each(v.Map(
@@ -271,7 +275,7 @@ func (h *ObjectHandler) uploadObjectPhoto(w http.ResponseWriter, r *http.Request
 	if err := r.ParseMultipartForm(h.MaxUploadSize); err != nil {
 		httputils.FailureResponse(
 			w, r,
-			fmt.Errorf("too big size, max is %d", h.MaxUploadSize),
+			fmt.Errorf("failted to parse multipart form - %w", err),
 			http.StatusBadRequest,
 		)
 		return
@@ -303,7 +307,7 @@ func (h *ObjectHandler) uploadObjectPhoto(w http.ResponseWriter, r *http.Request
 	if filetype != "image/jpeg" && filetype != "image/png" {
 		httputils.FailureResponse(
 			w, r,
-			fmt.Errorf("invalid photo format, must be image/jpeg or image/jpeg"),
+			fmt.Errorf("invalid photo format, must be image/jpeg or image/png"),
 			http.StatusBadRequest,
 		)
 		return

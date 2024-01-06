@@ -75,6 +75,7 @@ func (uc *objectUsecase) UpdateObject(
 	inputObject.Id = existingObject.Id
 	inputObject.CreatedAt = existingObject.CreatedAt
 	inputObject.ComparisonId = existingObject.ComparisonId
+	inputObject.PhotoPath = existingObject.PhotoPath
 
 	if err := uc.objRepo.UpdateObject(ctx, inputObject); err != nil {
 		return fmt.Errorf("failed to update object - %w", err)
@@ -105,14 +106,14 @@ func (uc *objectUsecase) UpdateObject(
 func (uc *objectUsecase) CreateObject(
 	ctx context.Context,
 	object *domain.Object,
-) error {
+) (string, error) {
 	object.Id = uuid.NewString()
 	object.CreatedAt = time.Now()
 	if err := uc.objRepo.CreateObject(ctx, object); err != nil {
-		return fmt.Errorf("failed to create object - %w", err)
+		return "", fmt.Errorf("failed to create object - %w", err)
 	}
 
-	return nil
+	return object.Id, nil
 }
 
 func (uc *objectUsecase) DeleteObject(ctx context.Context, id string) error {

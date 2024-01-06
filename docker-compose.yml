@@ -24,3 +24,14 @@ services:
     ports:
       - ${MONGODB_HOSTPORT}:27017
     restart: always
+
+  client:
+    container_name: comparison_center_frontend
+    build: ./frontend/
+    env_file:
+      - .env
+    ports:
+      - ${CLIENT_PORT}:3000
+    depends_on:
+      - app
+    restart: always

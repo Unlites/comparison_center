@@ -6,6 +6,7 @@ require github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
 
 require (
 	github.com/cenkalti/backoff/v4 v4.1.2 // indirect
+	github.com/go-chi/cors v1.2.1 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	go.uber.org/atomic v1.7.0 // indirect

@@ -1,3 +1,5 @@
 .env
 .mongo_db
 backend/photos
+frontend/node_modules
+frontend/.vscode
