@@ -20,14 +20,14 @@ type HttpServer struct {
 }
 
 type DB struct {
-	MongoURI      string `env:"MONGODB_URI" env-required:"true"`
-	MigrationsDir string `env:"MIGRATIONS_DIR" env-required:"true"`
+	URI           string `yaml:"uri"`
+	MigrationsDir string `yaml:"migrations_dir"`
 }
 
 type Config struct {
 	HttpServer `yaml:"http_server"`
-	DB
-	PhotosDir string `env:"PHOTOS_DIR" env-required:"true"`
+	DB         `yaml:"db"`
+	PhotosDir  string `yaml:"photos_dir"`
 }
 
 func NewConfig() (*Config, error) {

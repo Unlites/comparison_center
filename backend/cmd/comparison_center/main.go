@@ -34,7 +34,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(cfg.DB.MongoURI))
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(cfg.DB.URI))
 	if err != nil {
 		slog.ErrorContext(ctx, "failed to connect to mongodb", "detail", err)
 		os.Exit(1)

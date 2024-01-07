@@ -31,7 +31,7 @@ func main() {
 
 	m, err := migrate.New(
 		fmt.Sprintf("file:///%s", cfg.DB.MigrationsDir),
-		cfg.DB.MongoURI,
+		cfg.DB.URI,
 	)
 
 	if err != nil {

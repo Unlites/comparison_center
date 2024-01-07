@@ -5,3 +5,7 @@ http_server:
   idle_timeout: 60s
   shutdown_timeout: 10s
   max_upload_size_mb: 20
+db:
+  uri: mongodb://db:27017/database
+  migrations_dir: /app/migrations/mongo
+photos_dir: /app/photos
