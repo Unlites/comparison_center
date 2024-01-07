@@ -1,8 +1,7 @@
 import axios from 'axios'
-import { APP_URL } from './url'
 
 const instance = axios.create({
-    baseURL: APP_URL
+    baseURL: "/api/v1",
 })
 
 export default instance

@@ -1,8 +1,7 @@
 import http from '@/api'
-import { APP_URL } from './url'
 
 export const photoUrl = (id) => {
-    return `${APP_URL}/objects/${id}/photo`
+    return `${http.defaults.baseURL}/objects/${id}/photo`
 }
 
 export function getAllObjects(comparison_id) {
