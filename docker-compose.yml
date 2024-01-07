@@ -26,7 +26,7 @@ services:
     restart: always
 
   client:
-    container_name: comparison_center_frontend
+    container_name: comparison_center_client
     build: ./frontend/
     env_file:
       - .env
