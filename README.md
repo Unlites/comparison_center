@@ -6,6 +6,13 @@ Service for centralized and custom comparison of any categories of objects.
 
 ```shell
 git clone https://github.com/Unlites/comparison_center
+```
+
+After cloning the project, create .env file based on .env.sample with overriding parameters if necessary.
+
+Make sure that Docker service is currently running on your system. Then:
+
+```shell
 make run
 make migrate_up
 ```
