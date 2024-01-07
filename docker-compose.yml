@@ -28,8 +28,6 @@ services:
   client:
     container_name: comparison_center_client
     build: ./frontend/
-    env_file:
-      - .env
     ports:
       - ${CLIENT_PORT}:3000
     depends_on:
