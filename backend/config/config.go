@@ -25,9 +25,11 @@ type DB struct {
 }
 
 type Config struct {
-	HttpServer `yaml:"http_server"`
-	DB         `yaml:"db"`
-	PhotosDir  string `yaml:"photos_dir"`
+	HttpServer     `yaml:"http_server"`
+	MetricsAddress string `yaml:"metrics_address"`
+	DB             `yaml:"db"`
+	PhotosDir      string `yaml:"photos_dir"`
+	LogLevel       string `yaml:"log_level"`
 }
 
 func NewConfig() (*Config, error) {

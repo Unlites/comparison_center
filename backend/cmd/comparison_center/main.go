@@ -2,27 +2,17 @@ package main
 
 import (
 	"context"
-	"errors"
 	"log/slog"
-	"net/http"
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
 
 	"github.com/Unlites/comparison_center/backend/config"
-	ch "github.com/Unlites/comparison_center/backend/internal/comparison/delivery/http/v1"
-	cr "github.com/Unlites/comparison_center/backend/internal/comparison/repository"
-	cu "github.com/Unlites/comparison_center/backend/internal/comparison/usecase"
-	coh "github.com/Unlites/comparison_center/backend/internal/customoption/delivery/http/v1"
-	cor "github.com/Unlites/comparison_center/backend/internal/customoption/repository"
-	cou "github.com/Unlites/comparison_center/backend/internal/customoption/usecase"
-	oh "github.com/Unlites/comparison_center/backend/internal/object/delivery/http/v1"
-	or "github.com/Unlites/comparison_center/backend/internal/object/repository"
-	ou "github.com/Unlites/comparison_center/backend/internal/object/usecase"
-	ocor "github.com/Unlites/comparison_center/backend/internal/object_customoption/repository"
-	r "github.com/Unlites/comparison_center/backend/pkg/router"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
+	"github.com/Unlites/comparison_center/backend/internal/app"
+	"github.com/Unlites/comparison_center/backend/internal/utils/parser"
+
+	"github.com/Unlites/comparison_center/backend/pkg/metrics"
 )
 
 func main() {
@@ -30,69 +20,77 @@ func main() {
 
 	cfg, err := config.NewConfig()
 	if err != nil {
-		slog.ErrorContext(ctx, "failed to init config", "detail", err)
+		slog.Error("failed to init config", "detail", err)
 		os.Exit(1)
 	}
 
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(cfg.DB.URI))
-	if err != nil {
-		slog.ErrorContext(ctx, "failed to connect to mongodb", "detail", err)
-		os.Exit(1)
-	}
+	log := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
+		Level: parser.ParseSlogLevel(cfg.LogLevel),
+	}))
 
-	comparisonRepository := cr.NewComparisonRepositoryMongo(client)
-	comparisonUsecase := cu.NewComparisonUsecase(comparisonRepository)
-	comparisonHandler := ch.NewComparisonHandler(comparisonUsecase)
-
-	customOptionRepository := cor.NewCustomOptionRepositoryMongo(client)
-	customOptionUsecase := cou.NewCustomOptionUsecase(customOptionRepository)
-	customOptionHandler := coh.NewCustomOptionHandler(customOptionUsecase)
-
-	objectRepository := or.NewObjectRepositoryMongo(client)
-	objectCustomOptionRepository := ocor.NewObjectCustomOptionRepositoryMongo(client)
-	objectUsecase := ou.NewObjectUsecase(objectRepository, objectCustomOptionRepository)
-	objectHandler := oh.NewObjectHandler(objectUsecase, cfg.PhotosDir, cfg.MaxUploadSizeMB)
-
-	router := r.NewDefaultRouter()
-	router.RegisterHandlers("v1", map[string]http.Handler{
-		"comparisons":    comparisonHandler.Router,
-		"custom_options": customOptionHandler.Router,
-		"objects":        objectHandler.Router,
-	})
-
-	srv := &http.Server{
-		Addr:         cfg.HttpServer.Address,
-		Handler:      router.Handler,
-		ReadTimeout:  cfg.HttpServer.ReadTimeout,
-		WriteTimeout: cfg.HttpServer.WriteTimeout,
-		IdleTimeout:  cfg.HttpServer.IdleTimeout,
-	}
-
-	slog.InfoContext(ctx, "starting server...", "addr", cfg.HttpServer.Address)
+	metrics := metrics.NewMetrics(cfg.MetricsAddress)
 
 	go func() {
-		if err := srv.ListenAndServe(); !errors.Is(err, http.ErrServerClosed) {
-			slog.ErrorContext(ctx, "failed to start server", "detail", err)
+		log.Info("starting metrics server", "addr", cfg.MetricsAddress)
+		if err := metrics.Run(); err != nil {
+			log.Error("failed to start metrics server", "detail", err)
 			os.Exit(1)
 		}
 	}()
 
-	slog.InfoContext(ctx, "server started")
+	application, err := app.NewApp(ctx, log, cfg)
+	if err != nil {
+		log.Error("failed to init application", "detail", err)
+		os.Exit(1)
+	}
 
-	quit := make(chan os.Signal, 1)
-	signal.Notify(quit, syscall.SIGTERM, syscall.SIGINT)
+	go func() {
+		log.Info("starting application server", "addr", cfg.HttpServer.Address)
+		if err := application.Run(); err != nil {
+			log.Error("failed to start application server", "detail", err)
+			os.Exit(1)
+		}
+	}()
 
-	<-quit
-	slog.InfoContext(ctx, "server gracefully stopping...")
+	notifyCtx, cancel := signal.NotifyContext(ctx, syscall.SIGINT, syscall.SIGTERM)
+	defer cancel()
+
+	<-notifyCtx.Done()
+	log.Info("service gracefully stopping...")
 
 	shutDownCtx, cancel := context.WithTimeout(ctx, cfg.HttpServer.ShutdownTimeout)
 	defer cancel()
 
-	if err := srv.Shutdown(shutDownCtx); err != nil {
-		slog.ErrorContext(ctx, "failed to gracefully stop the server")
-		os.Exit(1)
-	}
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		if err := application.Stop(shutDownCtx); err != nil {
+			log.Error("failed to stop application server", "detail", err)
+		}
+		log.Info("application server stopped")
+	}()
 
-	slog.InfoContext(ctx, "server gracefully stopped")
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		if err := metrics.Stop(shutDownCtx); err != nil {
+			log.Error("failed to stop metrics server", "detail", err)
+		}
+		log.Info("metrics server stopped")
+	}()
 
+	gracefullyDoneCh := make(chan struct{})
+
+	go func() {
+		select {
+		case <-shutDownCtx.Done():
+			log.Info("service stopped due to shutdown timeout")
+		case <-gracefullyDoneCh:
+			log.Info("service stopped gracefully")
+		}
+	}()
+
+	wg.Wait()
+	close(gracefullyDoneCh)
 }
