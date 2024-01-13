@@ -33,3 +33,40 @@ services:
     depends_on:
       - app
     restart: always
+
+  prometheus:
+    container_name: prometheus
+    image: prom/prometheus:v2.43.0
+    volumes:
+      - ./metrics/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    expose:
+      - 9090
+    restart: always
+
+  node_exporter:
+    container_name: node_exporter
+    image: prom/node-exporter:v1.5.0
+    expose:
+      - 9100
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    restart: always
+
+  grafana:
+    container_name: grafana
+    user: "0:0"
+    image: grafana/grafana-oss:9.4.7
+    ports:
+      - ${GRAFANA_HOSTPORT}:3000
+    volumes:
+      - ./.grafana_data:/var/lib/grafana
+      - ./metrics/grafana/datasources:/etc/grafana/provisioning/datasources
+      - ./metrics/grafana/provisioning:/etc/grafana/provisioning/dashboards
+    restart: always
