@@ -67,6 +67,7 @@ func main() {
 		defer wg.Done()
 		if err := application.Stop(shutDownCtx); err != nil {
 			log.Error("failed to stop application server", "detail", err)
+			return
 		}
 		log.Info("application server stopped")
 	}()
@@ -76,6 +77,7 @@ func main() {
 		defer wg.Done()
 		if err := metrics.Stop(shutDownCtx); err != nil {
 			log.Error("failed to stop metrics server", "detail", err)
+			return
 		}
 		log.Info("metrics server stopped")
 	}()
