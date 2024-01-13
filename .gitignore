@@ -3,3 +3,4 @@
 backend/photos
 frontend/node_modules
 frontend/.vscode
+.grafana_data
