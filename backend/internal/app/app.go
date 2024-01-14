@@ -14,6 +14,7 @@ import (
 	coh "github.com/Unlites/comparison_center/backend/internal/customoption/delivery/http/v1"
 	cor "github.com/Unlites/comparison_center/backend/internal/customoption/repository"
 	cou "github.com/Unlites/comparison_center/backend/internal/customoption/usecase"
+	middleware "github.com/Unlites/comparison_center/backend/internal/middleware/http"
 	oh "github.com/Unlites/comparison_center/backend/internal/object/delivery/http/v1"
 	or "github.com/Unlites/comparison_center/backend/internal/object/repository"
 	ou "github.com/Unlites/comparison_center/backend/internal/object/usecase"
@@ -49,6 +50,7 @@ func NewApp(ctx context.Context, log *slog.Logger, cfg *config.Config) (*App, er
 	objectHandler := oh.NewObjectHandler(objectUsecase, cfg.PhotosDir, cfg.MaxUploadSizeMB)
 
 	router := r.NewDefaultRouter()
+	router.Handler.Use(middleware.Metrics)
 	router.RegisterHandlers("v1", map[string]http.Handler{
 		"comparisons":    comparisonHandler.Router,
 		"custom_options": customOptionHandler.Router,
