@@ -8,7 +8,7 @@ import (
 	"strconv"
 
 	"github.com/Unlites/comparison_center/backend/internal/domain"
-	httputils "github.com/Unlites/comparison_center/backend/internal/utils/http"
+	hu "github.com/Unlites/comparison_center/backend/internal/utils/http"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	v "github.com/go-ozzo/ozzo-validation"
@@ -44,7 +44,7 @@ type customOptionResponse struct {
 func (h *CustomOptionHandler) GetCustomOptions(w http.ResponseWriter, r *http.Request) {
 	filter, err := h.getFilter(r.URL.Query())
 	if err != nil {
-		httputils.FailureResponse(
+		hu.FailureResponse(
 			w, r,
 			fmt.Errorf("parse filter error - %w", err),
 			http.StatusBadRequest,
@@ -54,7 +54,7 @@ func (h *CustomOptionHandler) GetCustomOptions(w http.ResponseWriter, r *http.Re
 
 	customOptions, err := h.uc.GetCustomOptions(r.Context(), filter)
 	if err != nil {
-		httputils.FailureResponse(
+		hu.FailureResponse(
 			w, r,
 			fmt.Errorf("get custom options error - %w", err),
 			http.StatusInternalServerError,
@@ -67,7 +67,7 @@ func (h *CustomOptionHandler) GetCustomOptions(w http.ResponseWriter, r *http.Re
 		customOptionResponses[i] = toCustomOptionResponse(co)
 	}
 
-	httputils.SuccessResponse(w, r, customOptionResponses)
+	hu.SuccessResponse(w, r, customOptionResponses)
 }
 
 func (h *CustomOptionHandler) GetCustomOptionById(w http.ResponseWriter, r *http.Request) {
@@ -81,7 +81,7 @@ func (h *CustomOptionHandler) GetCustomOptionById(w http.ResponseWriter, r *http
 			status = http.StatusNotFound
 		}
 
-		httputils.FailureResponse(
+		hu.FailureResponse(
 			w, r,
 			fmt.Errorf("get custom option error - %w", err),
 			status,
@@ -89,7 +89,7 @@ func (h *CustomOptionHandler) GetCustomOptionById(w http.ResponseWriter, r *http
 		return
 	}
 
-	httputils.SuccessResponse(w, r, toCustomOptionResponse(customOption))
+	hu.SuccessResponse(w, r, toCustomOptionResponse(customOption))
 }
 
 type createCustomOptionInput struct {
@@ -104,7 +104,7 @@ func (ci *createCustomOptionInput) Bind(r *http.Request) error {
 
 func (h *CustomOptionHandler) CreateCustomOption(w http.ResponseWriter, r *http.Request) {
 	if r.Body == http.NoBody {
-		httputils.FailureResponse(
+		hu.FailureResponse(
 			w, r,
 			fmt.Errorf("validation error - request body required"),
 			http.StatusBadRequest,
@@ -114,7 +114,7 @@ func (h *CustomOptionHandler) CreateCustomOption(w http.ResponseWriter, r *http.
 
 	var input createCustomOptionInput
 	if err := render.Bind(r, &input); err != nil {
-		httputils.FailureResponse(
+		hu.FailureResponse(
 			w, r,
 			fmt.Errorf("validation error - %w", err),
 			http.StatusBadRequest,
@@ -124,7 +124,7 @@ func (h *CustomOptionHandler) CreateCustomOption(w http.ResponseWriter, r *http.
 
 	err := h.uc.CreateCustomOption(r.Context(), &domain.CustomOption{Name: input.Name})
 	if err != nil {
-		httputils.FailureResponse(
+		hu.FailureResponse(
 			w, r,
 			fmt.Errorf("create custom option error - %w", err),
 			http.StatusInternalServerError,
@@ -132,7 +132,7 @@ func (h *CustomOptionHandler) CreateCustomOption(w http.ResponseWriter, r *http.
 		return
 	}
 
-	httputils.SuccessResponse(w, r, nil)
+	hu.SuccessResponse(w, r, nil)
 }
 
 type updateCustomOptionInput struct {
@@ -147,7 +147,7 @@ func (ci *updateCustomOptionInput) Bind(r *http.Request) error {
 
 func (h *CustomOptionHandler) UpdateCustomOption(w http.ResponseWriter, r *http.Request) {
 	if r.Body == http.NoBody {
-		httputils.FailureResponse(
+		hu.FailureResponse(
 			w, r,
 			fmt.Errorf("validation error - request body required"),
 			http.StatusBadRequest,
@@ -159,7 +159,7 @@ func (h *CustomOptionHandler) UpdateCustomOption(w http.ResponseWriter, r *http.
 
 	var input updateCustomOptionInput
 	if err := render.Bind(r, &input); err != nil {
-		httputils.FailureResponse(
+		hu.FailureResponse(
 			w, r,
 			fmt.Errorf("validation error - %w", err),
 			http.StatusBadRequest,
@@ -177,7 +177,7 @@ func (h *CustomOptionHandler) UpdateCustomOption(w http.ResponseWriter, r *http.
 			status = http.StatusNotFound
 		}
 
-		httputils.FailureResponse(
+		hu.FailureResponse(
 			w, r,
 			fmt.Errorf("update custom option error - %w", err),
 			status,
@@ -185,7 +185,7 @@ func (h *CustomOptionHandler) UpdateCustomOption(w http.ResponseWriter, r *http.
 		return
 	}
 
-	httputils.SuccessResponse(w, r, nil)
+	hu.SuccessResponse(w, r, nil)
 }
 
 func (h *CustomOptionHandler) DeleteCustomOption(w http.ResponseWriter, r *http.Request) {
@@ -198,7 +198,7 @@ func (h *CustomOptionHandler) DeleteCustomOption(w http.ResponseWriter, r *http.
 			status = http.StatusNotFound
 		}
 
-		httputils.FailureResponse(
+		hu.FailureResponse(
 			w, r,
 			fmt.Errorf("delete custom option error - %w", err),
 			status,
@@ -206,7 +206,7 @@ func (h *CustomOptionHandler) DeleteCustomOption(w http.ResponseWriter, r *http.
 		return
 	}
 
-	httputils.SuccessResponse(w, r, nil)
+	hu.SuccessResponse(w, r, nil)
 }
 
 func (h *CustomOptionHandler) getFilter(params url.Values) (*domain.CustomOptionFilter, error) {

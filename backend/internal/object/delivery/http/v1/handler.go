@@ -12,7 +12,7 @@ import (
 	"time"
 
 	"github.com/Unlites/comparison_center/backend/internal/domain"
-	httputils "github.com/Unlites/comparison_center/backend/internal/utils/http"
+	hu "github.com/Unlites/comparison_center/backend/internal/utils/http"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	"github.com/go-ozzo/ozzo-validation/is"
@@ -66,7 +66,7 @@ type objectResponse struct {
 func (h *ObjectHandler) GetObjects(w http.ResponseWriter, r *http.Request) {
 	filter, err := h.getFilter(r.URL.Query())
 	if err != nil {
-		httputils.FailureResponse(
+		hu.FailureResponse(
 			w, r,
 			fmt.Errorf("parse filter error - %w", err),
 			http.StatusBadRequest,
@@ -76,7 +76,7 @@ func (h *ObjectHandler) GetObjects(w http.ResponseWriter, r *http.Request) {
 
 	objects, err := h.uc.GetObjects(r.Context(), filter)
 	if err != nil {
-		httputils.FailureResponse(
+		hu.FailureResponse(
 			w, r,
 			fmt.Errorf("get objects error - %w", err),
 			http.StatusInternalServerError,
@@ -89,7 +89,7 @@ func (h *ObjectHandler) GetObjects(w http.ResponseWriter, r *http.Request) {
 		objectResponses[i] = toObjectResponse(o)
 	}
 
-	httputils.SuccessResponse(w, r, objectResponses)
+	hu.SuccessResponse(w, r, objectResponses)
 }
 
 func (h *ObjectHandler) GetObjectById(w http.ResponseWriter, r *http.Request) {
@@ -103,7 +103,7 @@ func (h *ObjectHandler) GetObjectById(w http.ResponseWriter, r *http.Request) {
 			status = http.StatusNotFound
 		}
 
-		httputils.FailureResponse(
+		hu.FailureResponse(
 			w, r,
 			fmt.Errorf("get object error - %w", err),
 			status,
@@ -111,7 +111,7 @@ func (h *ObjectHandler) GetObjectById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	httputils.SuccessResponse(w, r, toObjectResponse(object))
+	hu.SuccessResponse(w, r, toObjectResponse(object))
 }
 
 type createObjectInput struct {
@@ -138,7 +138,7 @@ type returnedIdResponse struct {
 
 func (h *ObjectHandler) CreateObject(w http.ResponseWriter, r *http.Request) {
 	if r.Body == http.NoBody {
-		httputils.FailureResponse(
+		hu.FailureResponse(
 			w, r,
 			fmt.Errorf("validation error - request body required"),
 			http.StatusBadRequest,
@@ -148,7 +148,7 @@ func (h *ObjectHandler) CreateObject(w http.ResponseWriter, r *http.Request) {
 
 	var input createObjectInput
 	if err := render.Bind(r, &input); err != nil {
-		httputils.FailureResponse(
+		hu.FailureResponse(
 			w, r,
 			fmt.Errorf("validation error - %w", err),
 			http.StatusBadRequest,
@@ -164,7 +164,7 @@ func (h *ObjectHandler) CreateObject(w http.ResponseWriter, r *http.Request) {
 		ComparisonId: input.ComparisonId,
 	})
 	if err != nil {
-		httputils.FailureResponse(
+		hu.FailureResponse(
 			w, r,
 			fmt.Errorf("create object error - %w", err),
 			http.StatusInternalServerError,
@@ -172,7 +172,7 @@ func (h *ObjectHandler) CreateObject(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	httputils.SuccessResponse(w, r, &returnedIdResponse{Id: id})
+	hu.SuccessResponse(w, r, &returnedIdResponse{Id: id})
 }
 
 type updateObjectInput struct {
@@ -198,7 +198,7 @@ func (oi *updateObjectInput) Bind(r *http.Request) error {
 
 func (h *ObjectHandler) UpdateObject(w http.ResponseWriter, r *http.Request) {
 	if r.Body == http.NoBody {
-		httputils.FailureResponse(
+		hu.FailureResponse(
 			w, r,
 			fmt.Errorf("validation error - request body required"),
 			http.StatusBadRequest,
@@ -210,7 +210,7 @@ func (h *ObjectHandler) UpdateObject(w http.ResponseWriter, r *http.Request) {
 
 	var input updateObjectInput
 	if err := render.Bind(r, &input); err != nil {
-		httputils.FailureResponse(
+		hu.FailureResponse(
 			w, r,
 			fmt.Errorf("validation error - %w", err),
 			http.StatusBadRequest,
@@ -241,7 +241,7 @@ func (h *ObjectHandler) UpdateObject(w http.ResponseWriter, r *http.Request) {
 			status = http.StatusNotFound
 		}
 
-		httputils.FailureResponse(
+		hu.FailureResponse(
 			w, r,
 			fmt.Errorf("update object error - %w", err),
 			status,
@@ -249,7 +249,7 @@ func (h *ObjectHandler) UpdateObject(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	httputils.SuccessResponse(w, r, nil)
+	hu.SuccessResponse(w, r, nil)
 }
 
 func (h *ObjectHandler) DeleteObject(w http.ResponseWriter, r *http.Request) {
@@ -262,7 +262,7 @@ func (h *ObjectHandler) DeleteObject(w http.ResponseWriter, r *http.Request) {
 			status = http.StatusNotFound
 		}
 
-		httputils.FailureResponse(
+		hu.FailureResponse(
 			w, r,
 			fmt.Errorf("delete object error - %w", err),
 			status,
@@ -270,14 +270,14 @@ func (h *ObjectHandler) DeleteObject(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	httputils.SuccessResponse(w, r, nil)
+	hu.SuccessResponse(w, r, nil)
 }
 
 func (h *ObjectHandler) UploadObjectPhoto(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	r.Body = http.MaxBytesReader(w, r.Body, h.maxUploadSize)
 	if err := r.ParseMultipartForm(h.maxUploadSize); err != nil {
-		httputils.FailureResponse(
+		hu.FailureResponse(
 			w, r,
 			fmt.Errorf("failted to parse multipart form - %w", err),
 			http.StatusBadRequest,
@@ -287,7 +287,7 @@ func (h *ObjectHandler) UploadObjectPhoto(w http.ResponseWriter, r *http.Request
 
 	file, fileHeader, err := r.FormFile("photo")
 	if err != nil {
-		httputils.FailureResponse(
+		hu.FailureResponse(
 			w, r,
 			fmt.Errorf("failed to get photo - %w", err),
 			http.StatusBadRequest,
@@ -299,7 +299,7 @@ func (h *ObjectHandler) UploadObjectPhoto(w http.ResponseWriter, r *http.Request
 	buff := make([]byte, 512)
 	_, err = file.Read(buff)
 	if err != nil {
-		httputils.FailureResponse(
+		hu.FailureResponse(
 			w, r,
 			fmt.Errorf("failed to read photo - %w", err),
 			http.StatusInternalServerError,
@@ -309,7 +309,7 @@ func (h *ObjectHandler) UploadObjectPhoto(w http.ResponseWriter, r *http.Request
 
 	filetype := http.DetectContentType(buff)
 	if filetype != "image/jpeg" && filetype != "image/png" {
-		httputils.FailureResponse(
+		hu.FailureResponse(
 			w, r,
 			fmt.Errorf("invalid photo format, must be image/jpeg or image/png"),
 			http.StatusBadRequest,
@@ -319,7 +319,7 @@ func (h *ObjectHandler) UploadObjectPhoto(w http.ResponseWriter, r *http.Request
 
 	_, err = file.Seek(0, io.SeekStart)
 	if err != nil {
-		httputils.FailureResponse(
+		hu.FailureResponse(
 			w, r,
 			fmt.Errorf("failed to seek photo - %w", err),
 			http.StatusBadRequest,
@@ -336,7 +336,7 @@ func (h *ObjectHandler) UploadObjectPhoto(w http.ResponseWriter, r *http.Request
 
 	newPhoto, err := os.Create(photoPath)
 	if err != nil {
-		httputils.FailureResponse(
+		hu.FailureResponse(
 			w, r,
 			fmt.Errorf("failed to create photo - %w", err),
 			http.StatusInternalServerError,
@@ -347,7 +347,7 @@ func (h *ObjectHandler) UploadObjectPhoto(w http.ResponseWriter, r *http.Request
 
 	_, err = io.Copy(newPhoto, file)
 	if err != nil {
-		httputils.FailureResponse(
+		hu.FailureResponse(
 			w, r,
 			fmt.Errorf("failed to save photo - %w", err),
 			http.StatusInternalServerError,
@@ -356,7 +356,7 @@ func (h *ObjectHandler) UploadObjectPhoto(w http.ResponseWriter, r *http.Request
 	}
 
 	if err := h.uc.SetObjectPhotoPath(r.Context(), id, photoPath); err != nil {
-		httputils.FailureResponse(
+		hu.FailureResponse(
 			w, r,
 			fmt.Errorf("failed to set photo path - %w", err),
 			http.StatusInternalServerError,
@@ -365,7 +365,7 @@ func (h *ObjectHandler) UploadObjectPhoto(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	httputils.SuccessResponse(w, r, nil)
+	hu.SuccessResponse(w, r, nil)
 }
 func (h *ObjectHandler) GetObjectPhoto(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
@@ -378,7 +378,7 @@ func (h *ObjectHandler) GetObjectPhoto(w http.ResponseWriter, r *http.Request) {
 			status = http.StatusNotFound
 		}
 
-		httputils.FailureResponse(
+		hu.FailureResponse(
 			w, r,
 			fmt.Errorf("failed to set photo path - %w", err),
 			status,
@@ -394,7 +394,7 @@ func (h *ObjectHandler) GetObjectPhoto(w http.ResponseWriter, r *http.Request) {
 			status = http.StatusNotFound
 		}
 
-		httputils.FailureResponse(
+		hu.FailureResponse(
 			w, r,
 			fmt.Errorf("failed to open photo - %w", err),
 			status,
@@ -404,7 +404,7 @@ func (h *ObjectHandler) GetObjectPhoto(w http.ResponseWriter, r *http.Request) {
 
 	_, err = io.Copy(w, file)
 	if err != nil {
-		httputils.FailureResponse(
+		hu.FailureResponse(
 			w, r,
 			fmt.Errorf("failed to send photo - %w", err),
 			http.StatusInternalServerError,

@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/Unlites/comparison_center/backend/internal/domain"
-	httputils "github.com/Unlites/comparison_center/backend/internal/utils/http"
+	hu "github.com/Unlites/comparison_center/backend/internal/utils/http"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	v "github.com/go-ozzo/ozzo-validation"
@@ -48,7 +48,7 @@ type comparisonResponse struct {
 func (h *ComparisonHandler) GetComparisons(w http.ResponseWriter, r *http.Request) {
 	filter, err := h.getFilter(r.URL.Query())
 	if err != nil {
-		httputils.FailureResponse(
+		hu.FailureResponse(
 			w, r,
 			fmt.Errorf("parse filter error - %w", err),
 			http.StatusBadRequest,
@@ -58,7 +58,7 @@ func (h *ComparisonHandler) GetComparisons(w http.ResponseWriter, r *http.Reques
 
 	comparisons, err := h.uc.GetComparisons(r.Context(), filter)
 	if err != nil {
-		httputils.FailureResponse(
+		hu.FailureResponse(
 			w, r,
 			fmt.Errorf("get comparisons error - %w", err),
 			http.StatusInternalServerError,
@@ -71,7 +71,7 @@ func (h *ComparisonHandler) GetComparisons(w http.ResponseWriter, r *http.Reques
 		comparisonResponses[i] = toComparisonResponse(c)
 	}
 
-	httputils.SuccessResponse(w, r, comparisonResponses)
+	hu.SuccessResponse(w, r, comparisonResponses)
 }
 
 func (h *ComparisonHandler) GetComparisonById(w http.ResponseWriter, r *http.Request) {
@@ -85,7 +85,7 @@ func (h *ComparisonHandler) GetComparisonById(w http.ResponseWriter, r *http.Req
 			status = http.StatusNotFound
 		}
 
-		httputils.FailureResponse(
+		hu.FailureResponse(
 			w, r,
 			fmt.Errorf("get comparison error - %w", err),
 			status,
@@ -93,7 +93,7 @@ func (h *ComparisonHandler) GetComparisonById(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	httputils.SuccessResponse(w, r, toComparisonResponse(comparison))
+	hu.SuccessResponse(w, r, toComparisonResponse(comparison))
 }
 
 type createComparisonInput struct {
@@ -110,7 +110,7 @@ func (ci *createComparisonInput) Bind(r *http.Request) error {
 
 func (h *ComparisonHandler) CreateComparison(w http.ResponseWriter, r *http.Request) {
 	if r.Body == http.NoBody {
-		httputils.FailureResponse(
+		hu.FailureResponse(
 			w, r,
 			fmt.Errorf("validation error - request body required"),
 			http.StatusBadRequest,
@@ -120,7 +120,7 @@ func (h *ComparisonHandler) CreateComparison(w http.ResponseWriter, r *http.Requ
 
 	var input createComparisonInput
 	if err := render.Bind(r, &input); err != nil {
-		httputils.FailureResponse(
+		hu.FailureResponse(
 			w, r,
 			fmt.Errorf("validation error - %w", err),
 			http.StatusBadRequest,
@@ -143,7 +143,7 @@ func (h *ComparisonHandler) CreateComparison(w http.ResponseWriter, r *http.Requ
 			status = http.StatusBadRequest
 		}
 
-		httputils.FailureResponse(
+		hu.FailureResponse(
 			w, r,
 			fmt.Errorf("create comparison error - %w", err),
 			status,
@@ -151,7 +151,7 @@ func (h *ComparisonHandler) CreateComparison(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	httputils.SuccessResponse(w, r, nil)
+	hu.SuccessResponse(w, r, nil)
 }
 
 type updateComparisonInput struct {
@@ -168,7 +168,7 @@ func (ci *updateComparisonInput) Bind(r *http.Request) error {
 
 func (h *ComparisonHandler) UpdateComparison(w http.ResponseWriter, r *http.Request) {
 	if r.Body == http.NoBody {
-		httputils.FailureResponse(
+		hu.FailureResponse(
 			w, r,
 			fmt.Errorf("validation error - request body required"),
 			http.StatusBadRequest,
@@ -180,7 +180,7 @@ func (h *ComparisonHandler) UpdateComparison(w http.ResponseWriter, r *http.Requ
 
 	var input updateComparisonInput
 	if err := render.Bind(r, &input); err != nil {
-		httputils.FailureResponse(
+		hu.FailureResponse(
 			w, r,
 			fmt.Errorf("validation error - %w", err),
 			http.StatusBadRequest,
@@ -203,7 +203,7 @@ func (h *ComparisonHandler) UpdateComparison(w http.ResponseWriter, r *http.Requ
 			status = http.StatusNotFound
 		}
 
-		httputils.FailureResponse(
+		hu.FailureResponse(
 			w, r,
 			fmt.Errorf("update comparison error - %w", err),
 			status,
@@ -211,7 +211,7 @@ func (h *ComparisonHandler) UpdateComparison(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	httputils.SuccessResponse(w, r, nil)
+	hu.SuccessResponse(w, r, nil)
 }
 
 func (h *ComparisonHandler) DeleteComparison(w http.ResponseWriter, r *http.Request) {
@@ -224,7 +224,7 @@ func (h *ComparisonHandler) DeleteComparison(w http.ResponseWriter, r *http.Requ
 			status = http.StatusNotFound
 		}
 
-		httputils.FailureResponse(
+		hu.FailureResponse(
 			w, r,
 			fmt.Errorf("delete comparison error - %w", err),
 			status,
@@ -232,7 +232,7 @@ func (h *ComparisonHandler) DeleteComparison(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	httputils.SuccessResponse(w, r, nil)
+	hu.SuccessResponse(w, r, nil)
 }
 
 func (h *ComparisonHandler) getFilter(params url.Values) (*domain.ComparisonFilter, error) {
