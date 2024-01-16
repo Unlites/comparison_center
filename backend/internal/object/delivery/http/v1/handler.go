@@ -36,14 +36,14 @@ func NewObjectHandler(uc domain.ObjectUsecase, photosDir string, maxSize int64) 
 		uc:            uc,
 	}
 
-	router.Get("/", handler.getObjects)
-	router.Get("/{id}", handler.getObjectById)
-	router.Post("/", handler.createObject)
-	router.Put("/{id}", handler.updateObject)
-	router.Delete("/{id}", handler.deleteObject)
+	router.Get("/", handler.GetObjects)
+	router.Get("/{id}", handler.GetObjectById)
+	router.Post("/", handler.CreateObject)
+	router.Put("/{id}", handler.UpdateObject)
+	router.Delete("/{id}", handler.DeleteObject)
 
-	router.Get("/{id}/photo", handler.getObjectPhoto)
-	router.Post("/{id}/photo", handler.uploadObjectPhoto)
+	router.Get("/{id}/photo", handler.GetObjectPhoto)
+	router.Post("/{id}/photo", handler.UploadObjectPhoto)
 
 	return handler
 }
@@ -63,7 +63,7 @@ type objectResponse struct {
 	CustomOptions []map[string]string `json:"custom_options"`
 }
 
-func (h *ObjectHandler) getObjects(w http.ResponseWriter, r *http.Request) {
+func (h *ObjectHandler) GetObjects(w http.ResponseWriter, r *http.Request) {
 	filter, err := h.getFilter(r.URL.Query())
 	if err != nil {
 		httputils.FailureResponse(
@@ -92,7 +92,7 @@ func (h *ObjectHandler) getObjects(w http.ResponseWriter, r *http.Request) {
 	httputils.SuccessResponse(w, r, objectResponses)
 }
 
-func (h *ObjectHandler) getObjectById(w http.ResponseWriter, r *http.Request) {
+func (h *ObjectHandler) GetObjectById(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 
 	object, err := h.uc.GetObjectById(r.Context(), id)
@@ -136,7 +136,7 @@ type returnedIdResponse struct {
 	Id string `json:"id"`
 }
 
-func (h *ObjectHandler) createObject(w http.ResponseWriter, r *http.Request) {
+func (h *ObjectHandler) CreateObject(w http.ResponseWriter, r *http.Request) {
 	if r.Body == http.NoBody {
 		httputils.FailureResponse(
 			w, r,
@@ -196,7 +196,7 @@ func (oi *updateObjectInput) Bind(r *http.Request) error {
 	)
 }
 
-func (h *ObjectHandler) updateObject(w http.ResponseWriter, r *http.Request) {
+func (h *ObjectHandler) UpdateObject(w http.ResponseWriter, r *http.Request) {
 	if r.Body == http.NoBody {
 		httputils.FailureResponse(
 			w, r,
@@ -252,7 +252,7 @@ func (h *ObjectHandler) updateObject(w http.ResponseWriter, r *http.Request) {
 	httputils.SuccessResponse(w, r, nil)
 }
 
-func (h *ObjectHandler) deleteObject(w http.ResponseWriter, r *http.Request) {
+func (h *ObjectHandler) DeleteObject(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	err := h.uc.DeleteObject(r.Context(), id)
 	if err != nil {
@@ -273,7 +273,7 @@ func (h *ObjectHandler) deleteObject(w http.ResponseWriter, r *http.Request) {
 	httputils.SuccessResponse(w, r, nil)
 }
 
-func (h *ObjectHandler) uploadObjectPhoto(w http.ResponseWriter, r *http.Request) {
+func (h *ObjectHandler) UploadObjectPhoto(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	r.Body = http.MaxBytesReader(w, r.Body, h.MaxUploadSize)
 	if err := r.ParseMultipartForm(h.MaxUploadSize); err != nil {
@@ -367,7 +367,7 @@ func (h *ObjectHandler) uploadObjectPhoto(w http.ResponseWriter, r *http.Request
 
 	httputils.SuccessResponse(w, r, nil)
 }
-func (h *ObjectHandler) getObjectPhoto(w http.ResponseWriter, r *http.Request) {
+func (h *ObjectHandler) GetObjectPhoto(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 
 	object, err := h.uc.GetObjectById(r.Context(), id)

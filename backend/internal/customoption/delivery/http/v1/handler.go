@@ -23,11 +23,11 @@ func NewCustomOptionHandler(uc domain.CustomOptionUsecase) *CustomOptionHandler 
 	router := chi.NewRouter()
 	handler := &CustomOptionHandler{Router: router, uc: uc}
 
-	router.Get("/", handler.getCustomOptions)
-	router.Get("/{id}", handler.getCustomOptionById)
-	router.Post("/", handler.createCustomOption)
-	router.Put("/{id}", handler.updateCustomOption)
-	router.Delete("/{id}", handler.deleteCustomOption)
+	router.Get("/", handler.GetCustomOptions)
+	router.Get("/{id}", handler.GetCustomOptionById)
+	router.Post("/", handler.CreateCustomOption)
+	router.Put("/{id}", handler.UpdateCustomOption)
+	router.Delete("/{id}", handler.DeleteCustomOption)
 
 	return handler
 }
@@ -41,7 +41,7 @@ type customOptionResponse struct {
 	Name string `json:"name"`
 }
 
-func (h *CustomOptionHandler) getCustomOptions(w http.ResponseWriter, r *http.Request) {
+func (h *CustomOptionHandler) GetCustomOptions(w http.ResponseWriter, r *http.Request) {
 	filter, err := h.getFilter(r.URL.Query())
 	if err != nil {
 		httputils.FailureResponse(
@@ -70,7 +70,7 @@ func (h *CustomOptionHandler) getCustomOptions(w http.ResponseWriter, r *http.Re
 	httputils.SuccessResponse(w, r, customOptionResponses)
 }
 
-func (h *CustomOptionHandler) getCustomOptionById(w http.ResponseWriter, r *http.Request) {
+func (h *CustomOptionHandler) GetCustomOptionById(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 
 	customOption, err := h.uc.GetCustomOptionById(r.Context(), id)
@@ -102,7 +102,7 @@ func (ci *createCustomOptionInput) Bind(r *http.Request) error {
 	)
 }
 
-func (h *CustomOptionHandler) createCustomOption(w http.ResponseWriter, r *http.Request) {
+func (h *CustomOptionHandler) CreateCustomOption(w http.ResponseWriter, r *http.Request) {
 	if r.Body == http.NoBody {
 		httputils.FailureResponse(
 			w, r,
@@ -145,7 +145,7 @@ func (ci *updateCustomOptionInput) Bind(r *http.Request) error {
 	)
 }
 
-func (h *CustomOptionHandler) updateCustomOption(w http.ResponseWriter, r *http.Request) {
+func (h *CustomOptionHandler) UpdateCustomOption(w http.ResponseWriter, r *http.Request) {
 	if r.Body == http.NoBody {
 		httputils.FailureResponse(
 			w, r,
@@ -188,7 +188,7 @@ func (h *CustomOptionHandler) updateCustomOption(w http.ResponseWriter, r *http.
 	httputils.SuccessResponse(w, r, nil)
 }
 
-func (h *CustomOptionHandler) deleteCustomOption(w http.ResponseWriter, r *http.Request) {
+func (h *CustomOptionHandler) DeleteCustomOption(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	err := h.uc.DeleteCustomOption(r.Context(), id)
 	if err != nil {

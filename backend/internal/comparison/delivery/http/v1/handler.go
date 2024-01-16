@@ -25,11 +25,11 @@ func NewComparisonHandler(uc domain.ComparisonUsecase) *ComparisonHandler {
 	router := chi.NewRouter()
 	handler := &ComparisonHandler{Router: router, uc: uc}
 
-	router.Get("/", handler.getComparisons)
-	router.Get("/{id}", handler.getComparisonById)
-	router.Post("/", handler.createComparison)
-	router.Put("/{id}", handler.updateComparison)
-	router.Delete("/{id}", handler.deleteComparison)
+	router.Get("/", handler.GetComparisons)
+	router.Get("/{id}", handler.GetComparisonById)
+	router.Post("/", handler.CreateComparison)
+	router.Put("/{id}", handler.UpdateComparison)
+	router.Delete("/{id}", handler.DeleteComparison)
 
 	return handler
 }
@@ -45,7 +45,7 @@ type comparisonResponse struct {
 	CustomOptionIds []string  `json:"custom_option_ids"`
 }
 
-func (h *ComparisonHandler) getComparisons(w http.ResponseWriter, r *http.Request) {
+func (h *ComparisonHandler) GetComparisons(w http.ResponseWriter, r *http.Request) {
 	filter, err := h.getFilter(r.URL.Query())
 	if err != nil {
 		httputils.FailureResponse(
@@ -74,7 +74,7 @@ func (h *ComparisonHandler) getComparisons(w http.ResponseWriter, r *http.Reques
 	httputils.SuccessResponse(w, r, comparisonResponses)
 }
 
-func (h *ComparisonHandler) getComparisonById(w http.ResponseWriter, r *http.Request) {
+func (h *ComparisonHandler) GetComparisonById(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 
 	comparison, err := h.uc.GetComparisonById(r.Context(), id)
@@ -108,7 +108,7 @@ func (ci *createComparisonInput) Bind(r *http.Request) error {
 	)
 }
 
-func (h *ComparisonHandler) createComparison(w http.ResponseWriter, r *http.Request) {
+func (h *ComparisonHandler) CreateComparison(w http.ResponseWriter, r *http.Request) {
 	if r.Body == http.NoBody {
 		httputils.FailureResponse(
 			w, r,
@@ -166,7 +166,7 @@ func (ci *updateComparisonInput) Bind(r *http.Request) error {
 	)
 }
 
-func (h *ComparisonHandler) updateComparison(w http.ResponseWriter, r *http.Request) {
+func (h *ComparisonHandler) UpdateComparison(w http.ResponseWriter, r *http.Request) {
 	if r.Body == http.NoBody {
 		httputils.FailureResponse(
 			w, r,
@@ -214,7 +214,7 @@ func (h *ComparisonHandler) updateComparison(w http.ResponseWriter, r *http.Requ
 	httputils.SuccessResponse(w, r, nil)
 }
 
-func (h *ComparisonHandler) deleteComparison(w http.ResponseWriter, r *http.Request) {
+func (h *ComparisonHandler) DeleteComparison(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	err := h.uc.DeleteComparison(r.Context(), id)
 	if err != nil {
