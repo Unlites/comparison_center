@@ -15,13 +15,13 @@ import (
 )
 
 type CustomOptionHandler struct {
-	Router http.Handler
+	router http.Handler
 	uc     domain.CustomOptionUsecase
 }
 
 func NewCustomOptionHandler(uc domain.CustomOptionUsecase) *CustomOptionHandler {
 	router := chi.NewRouter()
-	handler := &CustomOptionHandler{Router: router, uc: uc}
+	handler := &CustomOptionHandler{router: router, uc: uc}
 
 	router.Get("/", handler.GetCustomOptions)
 	router.Get("/{id}", handler.GetCustomOptionById)
@@ -33,7 +33,7 @@ func NewCustomOptionHandler(uc domain.CustomOptionUsecase) *CustomOptionHandler 
 }
 
 func (h *CustomOptionHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	h.Router.ServeHTTP(w, r)
+	h.router.ServeHTTP(w, r)
 }
 
 type customOptionResponse struct {

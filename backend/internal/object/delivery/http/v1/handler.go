@@ -21,18 +21,18 @@ import (
 )
 
 type ObjectHandler struct {
-	Router        http.Handler
-	MaxUploadSize int64
-	PhotosDir     string
+	router        http.Handler
+	maxUploadSize int64
+	photosDir     string
 	uc            domain.ObjectUsecase
 }
 
 func NewObjectHandler(uc domain.ObjectUsecase, photosDir string, maxSize int64) *ObjectHandler {
 	router := chi.NewRouter()
 	handler := &ObjectHandler{
-		Router:        router,
-		MaxUploadSize: maxSize << 20,
-		PhotosDir:     photosDir,
+		router:        router,
+		maxUploadSize: maxSize << 20,
+		photosDir:     photosDir,
 		uc:            uc,
 	}
 
@@ -49,7 +49,7 @@ func NewObjectHandler(uc domain.ObjectUsecase, photosDir string, maxSize int64) 
 }
 
 func (h *ObjectHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	h.Router.ServeHTTP(w, r)
+	h.router.ServeHTTP(w, r)
 }
 
 type objectResponse struct {
@@ -275,8 +275,8 @@ func (h *ObjectHandler) DeleteObject(w http.ResponseWriter, r *http.Request) {
 
 func (h *ObjectHandler) UploadObjectPhoto(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
-	r.Body = http.MaxBytesReader(w, r.Body, h.MaxUploadSize)
-	if err := r.ParseMultipartForm(h.MaxUploadSize); err != nil {
+	r.Body = http.MaxBytesReader(w, r.Body, h.maxUploadSize)
+	if err := r.ParseMultipartForm(h.maxUploadSize); err != nil {
 		httputils.FailureResponse(
 			w, r,
 			fmt.Errorf("failted to parse multipart form - %w", err),
@@ -329,7 +329,7 @@ func (h *ObjectHandler) UploadObjectPhoto(w http.ResponseWriter, r *http.Request
 
 	photoPath := fmt.Sprintf(
 		"%s/%s%s",
-		h.PhotosDir,
+		h.photosDir,
 		uuid.NewString(),
 		filepath.Ext(fileHeader.Filename),
 	)

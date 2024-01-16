@@ -17,13 +17,13 @@ import (
 )
 
 type ComparisonHandler struct {
-	Router http.Handler
+	router http.Handler
 	uc     domain.ComparisonUsecase
 }
 
 func NewComparisonHandler(uc domain.ComparisonUsecase) *ComparisonHandler {
 	router := chi.NewRouter()
-	handler := &ComparisonHandler{Router: router, uc: uc}
+	handler := &ComparisonHandler{router: router, uc: uc}
 
 	router.Get("/", handler.GetComparisons)
 	router.Get("/{id}", handler.GetComparisonById)
@@ -35,7 +35,7 @@ func NewComparisonHandler(uc domain.ComparisonUsecase) *ComparisonHandler {
 }
 
 func (h *ComparisonHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	h.Router.ServeHTTP(w, r)
+	h.router.ServeHTTP(w, r)
 }
 
 type comparisonResponse struct {
