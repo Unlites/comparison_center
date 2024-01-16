@@ -32,6 +32,10 @@ func NewCustomOptionHandler(uc domain.CustomOptionUsecase) *CustomOptionHandler 
 	return handler
 }
 
+func (h *CustomOptionHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	h.Router.ServeHTTP(w, r)
+}
+
 type customOptionResponse struct {
 	Id   string `json:"id"`
 	Name string `json:"name"`

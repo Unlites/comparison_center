@@ -34,6 +34,10 @@ func NewComparisonHandler(uc domain.ComparisonUsecase) *ComparisonHandler {
 	return handler
 }
 
+func (h *ComparisonHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	h.Router.ServeHTTP(w, r)
+}
+
 type comparisonResponse struct {
 	Id              string    `json:"id"`
 	Name            string    `json:"name"`

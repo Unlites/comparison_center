@@ -52,9 +52,9 @@ func NewApp(ctx context.Context, log *slog.Logger, cfg *config.Config) (*App, er
 	router := r.NewDefaultRouter()
 	router.Handler.Use(middleware.Metrics)
 	router.RegisterHandlers("v1", map[string]http.Handler{
-		"comparisons":    comparisonHandler.Router,
-		"custom_options": customOptionHandler.Router,
-		"objects":        objectHandler.Router,
+		"comparisons":    comparisonHandler,
+		"custom_options": customOptionHandler,
+		"objects":        objectHandler,
 	})
 
 	srv := &http.Server{

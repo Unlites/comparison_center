@@ -48,6 +48,10 @@ func NewObjectHandler(uc domain.ObjectUsecase, photosDir string, maxSize int64) 
 	return handler
 }
 
+func (h *ObjectHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	h.Router.ServeHTTP(w, r)
+}
+
 type objectResponse struct {
 	Id            string              `json:"id"`
 	Name          string              `json:"name"`
