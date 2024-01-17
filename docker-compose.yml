@@ -35,7 +35,7 @@ services:
     restart: always
 
   prometheus:
-    container_name: prometheus
+    container_name: comparison_center_prometheus
     image: prom/prometheus:v2.43.0
     volumes:
       - ./metrics/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
@@ -44,7 +44,7 @@ services:
     restart: always
 
   node_exporter:
-    container_name: node_exporter
+    container_name: comparison_center_node_exporter
     image: prom/node-exporter:v1.5.0
     expose:
       - 9100
@@ -60,7 +60,7 @@ services:
     restart: always
 
   grafana:
-    container_name: grafana
+    container_name: comparison_center_grafana
     user: "0:0"
     image: grafana/grafana-oss:9.4.7
     ports:
@@ -68,5 +68,4 @@ services:
     volumes:
       - ./.grafana_data:/var/lib/grafana
       - ./metrics/grafana/datasources:/etc/grafana/provisioning/datasources
-      - ./metrics/grafana/provisioning:/etc/grafana/provisioning/dashboards
     restart: always
