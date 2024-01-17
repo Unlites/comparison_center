@@ -29,7 +29,7 @@ services:
     container_name: comparison_center_client
     build: ./frontend/
     ports:
-      - ${CLIENT_PORT}:3000
+      - ${CLIENT_HOSTPORT}:3000
     depends_on:
       - app
     restart: always
