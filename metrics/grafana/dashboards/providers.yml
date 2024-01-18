@@ -1,0 +1,9 @@
+apiVersion: 1
+
+providers:
+- name: Requests
+  folder: App
+  type: file
+  options:
+    path: 
+        /etc/grafana/provisioning/dashboards/requests.json
