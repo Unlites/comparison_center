@@ -85,14 +85,14 @@ func main() {
 	gracefullyDoneCh := make(chan struct{})
 
 	go func() {
-		select {
-		case <-shutDownCtx.Done():
-			log.Info("service stopped due to shutdown timeout")
-		case <-gracefullyDoneCh:
-			log.Info("service stopped gracefully")
-		}
+		wg.Wait()
+		close(gracefullyDoneCh)
 	}()
 
-	wg.Wait()
-	close(gracefullyDoneCh)
+	select {
+	case <-shutDownCtx.Done():
+		log.Info("service stopped due to shutdown timeout")
+	case <-gracefullyDoneCh:
+		log.Info("service stopped gracefully")
+	}
 }
