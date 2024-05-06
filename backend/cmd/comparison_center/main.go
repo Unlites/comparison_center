@@ -82,17 +82,6 @@ func main() {
 		log.Info("metrics server stopped")
 	}()
 
-	gracefullyDoneCh := make(chan struct{})
-
-	go func() {
-		wg.Wait()
-		close(gracefullyDoneCh)
-	}()
-
-	select {
-	case <-shutDownCtx.Done():
-		log.Info("service stopped due to shutdown timeout")
-	case <-gracefullyDoneCh:
-		log.Info("service stopped gracefully")
-	}
+	wg.Wait()
+	log.Info("service stopped")
 }
