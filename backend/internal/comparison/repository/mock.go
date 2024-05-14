@@ -17,16 +17,16 @@ func NewComparisonRepositoryMock() *comparisonRepositoryMock {
 
 func (repo *comparisonRepositoryMock) GetComparisons(
 	ctx context.Context,
-	filter *domain.ComparisonFilter,
-) ([]*domain.Comparison, error) {
+	filter domain.ComparisonFilter,
+) ([]domain.Comparison, error) {
 	args := repo.Called(ctx, filter)
 
 	ret, err := args.Get(0), args.Error(1)
 
-	var comparisons []*domain.Comparison
+	var comparisons []domain.Comparison
 
 	if ret != nil {
-		comparisons = ret.([]*domain.Comparison)
+		comparisons = ret.([]domain.Comparison)
 	}
 
 	return comparisons, err
@@ -35,15 +35,15 @@ func (repo *comparisonRepositoryMock) GetComparisons(
 func (repo *comparisonRepositoryMock) GetComparisonById(
 	ctx context.Context,
 	id string,
-) (*domain.Comparison, error) {
+) (domain.Comparison, error) {
 	args := repo.Called(ctx, id)
 
 	ret, err := args.Get(0), args.Error(1)
 
-	var comparison *domain.Comparison
+	var comparison domain.Comparison
 
 	if ret != nil {
-		comparison = ret.(*domain.Comparison)
+		comparison = ret.(domain.Comparison)
 	}
 
 	return comparison, err
@@ -51,7 +51,7 @@ func (repo *comparisonRepositoryMock) GetComparisonById(
 
 func (repo *comparisonRepositoryMock) UpdateComparison(
 	ctx context.Context,
-	comparison *domain.Comparison,
+	comparison domain.Comparison,
 ) error {
 	args := repo.Called(ctx, comparison)
 
@@ -60,7 +60,7 @@ func (repo *comparisonRepositoryMock) UpdateComparison(
 
 func (repo *comparisonRepositoryMock) CreateComparison(
 	ctx context.Context,
-	comparison *domain.Comparison,
+	comparison domain.Comparison,
 ) error {
 	args := repo.Called(ctx, comparison)
 

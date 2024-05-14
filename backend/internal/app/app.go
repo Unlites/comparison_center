@@ -19,6 +19,7 @@ import (
 	or "github.com/Unlites/comparison_center/backend/internal/object/repository"
 	ou "github.com/Unlites/comparison_center/backend/internal/object/usecase"
 	ocor "github.com/Unlites/comparison_center/backend/internal/object_customoption/repository"
+	g "github.com/Unlites/comparison_center/backend/pkg/generator"
 	r "github.com/Unlites/comparison_center/backend/pkg/router"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -36,8 +37,10 @@ func NewApp(ctx context.Context, log *slog.Logger, cfg *config.Config) (*App, er
 		return nil, fmt.Errorf("failed to connect to mongodb: %w", err)
 	}
 
+	generator := g.NewGenerator()
+
 	comparisonRepository := cr.NewComparisonRepositoryMongo(client)
-	comparisonUsecase := cu.NewComparisonUsecase(comparisonRepository)
+	comparisonUsecase := cu.NewComparisonUsecase(comparisonRepository, generator)
 	comparisonHandler := ch.NewComparisonHandler(comparisonUsecase)
 
 	customOptionRepository := cor.NewCustomOptionRepositoryMongo(client)

@@ -8,12 +8,18 @@ import (
 
 	"github.com/Unlites/comparison_center/backend/internal/comparison/repository"
 	"github.com/Unlites/comparison_center/backend/internal/domain"
+	g "github.com/Unlites/comparison_center/backend/pkg/generator"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestGetComparisons(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
-		returnedComparisons := []*domain.Comparison{
+		repo := repository.NewComparisonRepositoryMock()
+		generator := g.NewMockGenerator()
+		uc := NewComparisonUsecase(repo, generator)
+
+		ctx := context.Background()
+		returnedComparisons := []domain.Comparison{
 			{
 				Id:              "85434230werhuhi123912304",
 				Name:            "Cars",
@@ -28,11 +34,7 @@ func TestGetComparisons(t *testing.T) {
 			},
 		}
 
-		repo := repository.NewComparisonRepositoryMock()
-		uc := NewComparisonUsecase(repo)
-
-		ctx := context.Background()
-		filter := &domain.ComparisonFilter{
+		filter := domain.ComparisonFilter{
 			Limit:  2,
 			Offset: 0,
 		}
@@ -48,10 +50,11 @@ func TestGetComparisons(t *testing.T) {
 
 	t.Run("Error", func(t *testing.T) {
 		repo := repository.NewComparisonRepositoryMock()
-		uc := NewComparisonUsecase(repo)
+		generator := g.NewMockGenerator()
+		uc := NewComparisonUsecase(repo, generator)
 
 		ctx := context.Background()
-		filter := &domain.ComparisonFilter{
+		filter := domain.ComparisonFilter{
 			Limit:  2,
 			Offset: 0,
 		}
@@ -68,16 +71,16 @@ func TestGetComparisons(t *testing.T) {
 
 func TestGetComparisonById(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
-		returnedComparison := &domain.Comparison{
+		repo := repository.NewComparisonRepositoryMock()
+		generator := g.NewMockGenerator()
+		uc := NewComparisonUsecase(repo, generator)
 
+		returnedComparison := domain.Comparison{
 			Id:              "85434230werhuhi123912304",
 			Name:            "Cars",
 			CreatedAt:       time.Now(),
 			CustomOptionIds: []string{"43294320fdsfnj13213", "3240312rnwjnj49329"},
 		}
-
-		repo := repository.NewComparisonRepositoryMock()
-		uc := NewComparisonUsecase(repo)
 
 		ctx := context.Background()
 		id := "85434230werhuhi123912304"
@@ -93,7 +96,8 @@ func TestGetComparisonById(t *testing.T) {
 
 	t.Run("Error", func(t *testing.T) {
 		repo := repository.NewComparisonRepositoryMock()
-		uc := NewComparisonUsecase(repo)
+		generator := g.NewMockGenerator()
+		uc := NewComparisonUsecase(repo, generator)
 
 		ctx := context.Background()
 		id := "213213ewrwe9423432"
@@ -103,24 +107,33 @@ func TestGetComparisonById(t *testing.T) {
 		comparison, err := uc.GetComparisonById(ctx, id)
 
 		assert.Error(t, err)
-		assert.Nil(t, comparison)
+		assert.Empty(t, comparison)
 		repo.AssertExpectations(t)
 	})
 }
 
 func TestCreateComparison(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
-		inputComparison := &domain.Comparison{
+		repo := repository.NewComparisonRepositoryMock()
+		generator := g.NewMockGenerator()
+		uc := NewComparisonUsecase(repo, generator)
+
+		inputComparison := domain.Comparison{
 			Name:            "Cars",
 			CustomOptionIds: []string{"3332415fdsfsd31231", "5412asdsa131231`"},
 		}
 
-		repo := repository.NewComparisonRepositoryMock()
-		uc := NewComparisonUsecase(repo)
+		changedComparison := domain.Comparison{
+			Id:              "49234991asdsanjd12305",
+			Name:            inputComparison.Name,
+			CustomOptionIds: inputComparison.CustomOptionIds,
+			CreatedAt:       time.Now(),
+		}
 
 		ctx := context.Background()
 
-		repo.On("CreateComparison", ctx, inputComparison).Return(nil)
+		generator.On("GenerateId").Return("49234991asdsanjd12305")
+		repo.On("CreateComparison", ctx, changedComparison).Return(nil)
 
 		err := uc.CreateComparison(ctx, inputComparison)
 
@@ -129,17 +142,26 @@ func TestCreateComparison(t *testing.T) {
 	})
 
 	t.Run("Error", func(t *testing.T) {
-		inputComparison := &domain.Comparison{
+		repo := repository.NewComparisonRepositoryMock()
+		generator := g.NewMockGenerator()
+		uc := NewComparisonUsecase(repo, generator)
+
+		inputComparison := domain.Comparison{
 			Name:            "Cars",
 			CustomOptionIds: []string{"432432sadas5433da", "349fsda32bfsd21d"},
 		}
 
-		repo := repository.NewComparisonRepositoryMock()
-		uc := NewComparisonUsecase(repo)
+		changedComparison := domain.Comparison{
+			Id:              "32939fsdfsdf912312",
+			Name:            inputComparison.Name,
+			CustomOptionIds: inputComparison.CustomOptionIds,
+			CreatedAt:       time.Now(),
+		}
 
 		ctx := context.Background()
 
-		repo.On("CreateComparison", ctx, inputComparison).Return(errors.New("some error"))
+		generator.On("GenerateId").Return("32939fsdfsdf912312")
+		repo.On("CreateComparison", ctx, changedComparison).Return(errors.New("some error"))
 
 		err := uc.CreateComparison(ctx, inputComparison)
 
@@ -150,19 +172,35 @@ func TestCreateComparison(t *testing.T) {
 
 func TestUpdateComparison(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
-		inputComparison := &domain.Comparison{
+		repo := repository.NewComparisonRepositoryMock()
+		generator := g.NewMockGenerator()
+		uc := NewComparisonUsecase(repo, generator)
+
+		ctx := context.Background()
+
+		inputComparison := domain.Comparison{
 			Name:            "Cars",
 			CustomOptionIds: []string{"23491239dqwe14sddsf", "74329fdsfsdwe13123q"},
 		}
 
 		id := "94232dsadas21313ddsa"
 
-		repo := repository.NewComparisonRepositoryMock()
-		uc := NewComparisonUsecase(repo)
+		returnedComparison := domain.Comparison{
+			Id:              id,
+			Name:            "Cars",
+			CreatedAt:       time.Now(),
+			CustomOptionIds: []string{"43294320fdsfnj13213", "3240312rnwjnj49329"},
+		}
 
-		ctx := context.Background()
+		changedComparison := domain.Comparison{
+			Id:              id,
+			Name:            inputComparison.Name,
+			CreatedAt:       returnedComparison.CreatedAt,
+			CustomOptionIds: inputComparison.CustomOptionIds,
+		}
 
-		repo.On("UpdateComparison", ctx, inputComparison).Return(nil)
+		repo.On("GetComparisonById", ctx, id).Return(returnedComparison, nil)
+		repo.On("UpdateComparison", ctx, changedComparison).Return(nil)
 
 		err := uc.UpdateComparison(ctx, id, inputComparison)
 
@@ -171,19 +209,35 @@ func TestUpdateComparison(t *testing.T) {
 	})
 
 	t.Run("Error", func(t *testing.T) {
-		inputComparison := &domain.Comparison{
+		repo := repository.NewComparisonRepositoryMock()
+		generator := g.NewMockGenerator()
+		uc := NewComparisonUsecase(repo, generator)
+
+		ctx := context.Background()
+
+		inputComparison := domain.Comparison{
 			Name:            "Cars",
 			CustomOptionIds: []string{"23491239dqwe14sddsf", "74329fdsfsdwe13123q"},
 		}
 
 		id := "48213asd9332ewqse328"
 
-		repo := repository.NewComparisonRepositoryMock()
-		uc := NewComparisonUsecase(repo)
+		returnedComparison := domain.Comparison{
+			Id:              id,
+			Name:            "Cars",
+			CreatedAt:       time.Now(),
+			CustomOptionIds: []string{"43294320fdsfnj13213", "3240312rnwjnj49329"},
+		}
 
-		ctx := context.Background()
+		changedComparison := domain.Comparison{
+			Id:              id,
+			Name:            inputComparison.Name,
+			CreatedAt:       returnedComparison.CreatedAt,
+			CustomOptionIds: inputComparison.CustomOptionIds,
+		}
 
-		repo.On("UpdateComparison", ctx, inputComparison).Return(errors.New("some error"))
+		repo.On("GetComparisonById", ctx, id).Return(returnedComparison, nil)
+		repo.On("UpdateComparison", ctx, changedComparison).Return(errors.New("some error"))
 
 		err := uc.UpdateComparison(ctx, id, inputComparison)
 
@@ -195,7 +249,8 @@ func TestUpdateComparison(t *testing.T) {
 func TestDeleteComparison(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
 		repo := repository.NewComparisonRepositoryMock()
-		uc := NewComparisonUsecase(repo)
+		generator := g.NewMockGenerator()
+		uc := NewComparisonUsecase(repo, generator)
 
 		ctx := context.Background()
 		id := "34543dfsdfj32432jewr"
@@ -210,7 +265,8 @@ func TestDeleteComparison(t *testing.T) {
 
 	t.Run("Error", func(t *testing.T) {
 		repo := repository.NewComparisonRepositoryMock()
-		uc := NewComparisonUsecase(repo)
+		generator := g.NewMockGenerator()
+		uc := NewComparisonUsecase(repo, generator)
 
 		ctx := context.Background()
 		id := "92133easd123srewr132"

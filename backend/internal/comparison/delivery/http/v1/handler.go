@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/Unlites/comparison_center/backend/internal/comparison/usecase"
 	"github.com/Unlites/comparison_center/backend/internal/domain"
 	hu "github.com/Unlites/comparison_center/backend/internal/utils/http"
 	"github.com/go-chi/chi/v5"
@@ -18,10 +19,10 @@ import (
 
 type ComparisonHandler struct {
 	router http.Handler
-	uc     domain.ComparisonUsecase
+	uc     usecase.ComparisonUsecase
 }
 
-func NewComparisonHandler(uc domain.ComparisonUsecase) *ComparisonHandler {
+func NewComparisonHandler(uc usecase.ComparisonUsecase) *ComparisonHandler {
 	router := chi.NewRouter()
 	handler := &ComparisonHandler{router: router, uc: uc}
 
@@ -66,7 +67,7 @@ func (h *ComparisonHandler) GetComparisons(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	comparisonResponses := make([]*comparisonResponse, len(comparisons))
+	comparisonResponses := make([]comparisonResponse, len(comparisons))
 	for i, c := range comparisons {
 		comparisonResponses[i] = toComparisonResponse(c)
 	}
@@ -132,7 +133,7 @@ func (h *ComparisonHandler) CreateComparison(w http.ResponseWriter, r *http.Requ
 		input.CustomOptionIds = make([]string, 0)
 	}
 
-	err := h.uc.CreateComparison(r.Context(), &domain.Comparison{
+	err := h.uc.CreateComparison(r.Context(), domain.Comparison{
 		Name:            input.Name,
 		CustomOptionIds: input.CustomOptionIds,
 	})
@@ -192,7 +193,7 @@ func (h *ComparisonHandler) UpdateComparison(w http.ResponseWriter, r *http.Requ
 		input.CustomOptionIds = make([]string, 0)
 	}
 
-	err := h.uc.UpdateComparison(r.Context(), id, &domain.Comparison{
+	err := h.uc.UpdateComparison(r.Context(), id, domain.Comparison{
 		Name:            input.Name,
 		CustomOptionIds: input.CustomOptionIds,
 	})
@@ -235,7 +236,7 @@ func (h *ComparisonHandler) DeleteComparison(w http.ResponseWriter, r *http.Requ
 	hu.SuccessResponse(w, r, nil)
 }
 
-func (h *ComparisonHandler) getFilter(params url.Values) (*domain.ComparisonFilter, error) {
+func (h *ComparisonHandler) getFilter(params url.Values) (domain.ComparisonFilter, error) {
 	var limit int
 	var offset int
 	var orderBy string
@@ -246,7 +247,7 @@ func (h *ComparisonHandler) getFilter(params url.Values) (*domain.ComparisonFilt
 	if limitStr != "" {
 		limit, err = strconv.Atoi(limitStr)
 		if err != nil {
-			return nil, fmt.Errorf("incorrect limit value")
+			return domain.ComparisonFilter{}, fmt.Errorf("incorrect limit value")
 		}
 	}
 
@@ -254,7 +255,7 @@ func (h *ComparisonHandler) getFilter(params url.Values) (*domain.ComparisonFilt
 	if offsetStr != "" {
 		offset, err = strconv.Atoi(offsetStr)
 		if err != nil {
-			return nil, fmt.Errorf("incorrect offset value")
+			return domain.ComparisonFilter{}, fmt.Errorf("incorrect offset value")
 		}
 	}
 
@@ -263,8 +264,8 @@ func (h *ComparisonHandler) getFilter(params url.Values) (*domain.ComparisonFilt
 	return domain.NewComparisonFilter(limit, offset, orderBy)
 }
 
-func toComparisonResponse(comparison *domain.Comparison) *comparisonResponse {
-	return &comparisonResponse{
+func toComparisonResponse(comparison domain.Comparison) comparisonResponse {
+	return comparisonResponse{
 		Id:              comparison.Id,
 		Name:            comparison.Name,
 		CreatedAt:       comparison.CreatedAt,

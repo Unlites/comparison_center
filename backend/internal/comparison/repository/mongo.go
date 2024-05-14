@@ -31,8 +31,8 @@ func NewComparisonRepositoryMongo(client *mongo.Client) *comparisonRepositoryMon
 
 func (repo *comparisonRepositoryMongo) GetComparisons(
 	ctx context.Context,
-	filter *domain.ComparisonFilter,
-) ([]*domain.Comparison, error) {
+	filter domain.ComparisonFilter,
+) ([]domain.Comparison, error) {
 	opts := options.Find().
 		SetSort(bson.M{filter.OrderBy: 1}).
 		SetSkip(int64(filter.Offset)).
@@ -43,9 +43,9 @@ func (repo *comparisonRepositoryMongo) GetComparisons(
 		return nil, fmt.Errorf("fetch comparisons from mongo error: %w", err)
 	}
 
-	comparisons := make([]*domain.Comparison, 0, filter.Limit)
+	comparisons := make([]domain.Comparison, 0, filter.Limit)
 	for cur.Next(ctx) {
-		cm := new(comparisonMongo)
+		var cm comparisonMongo
 		if err := cur.Decode(cm); err != nil {
 			return nil, fmt.Errorf("decode mongo result error %w", err)
 		}
@@ -59,19 +59,19 @@ func (repo *comparisonRepositoryMongo) GetComparisons(
 func (repo *comparisonRepositoryMongo) GetComparisonById(
 	ctx context.Context,
 	id string,
-) (*domain.Comparison, error) {
+) (domain.Comparison, error) {
 	res := repo.comparisonsColl.FindOne(ctx, bson.M{"_id": id})
 	if res.Err() != nil {
 		if errors.Is(res.Err(), mongo.ErrNoDocuments) {
-			return nil, fmt.Errorf("comparison %w", domain.ErrNotFound)
+			return domain.Comparison{}, fmt.Errorf("comparison %w", domain.ErrNotFound)
 		}
 
-		return nil, fmt.Errorf("get comparison from mongo error %w", res.Err())
+		return domain.Comparison{}, fmt.Errorf("get comparison from mongo error %w", res.Err())
 	}
 
-	cm := new(comparisonMongo)
+	var cm comparisonMongo
 	if err := res.Decode(cm); err != nil {
-		return nil, fmt.Errorf("decode mongo result error %w", err)
+		return domain.Comparison{}, fmt.Errorf("decode mongo result error %w", err)
 	}
 
 	return toDomainComparison(cm), nil
@@ -79,7 +79,7 @@ func (repo *comparisonRepositoryMongo) GetComparisonById(
 
 func (repo *comparisonRepositoryMongo) UpdateComparison(
 	ctx context.Context,
-	comparison *domain.Comparison,
+	comparison domain.Comparison,
 ) error {
 	res, err := repo.comparisonsColl.UpdateOne(
 		ctx,
@@ -107,7 +107,7 @@ func (repo *comparisonRepositoryMongo) UpdateComparison(
 
 func (repo *comparisonRepositoryMongo) CreateComparison(
 	ctx context.Context,
-	comparison *domain.Comparison,
+	comparison domain.Comparison,
 ) error {
 	_, err := repo.comparisonsColl.InsertOne(ctx, toComparisonMongo(comparison))
 	if err != nil {
@@ -141,8 +141,8 @@ func (repo *comparisonRepositoryMongo) DeleteComparison(
 	return nil
 }
 
-func toComparisonMongo(domainComparison *domain.Comparison) *comparisonMongo {
-	return &comparisonMongo{
+func toComparisonMongo(domainComparison domain.Comparison) comparisonMongo {
+	return comparisonMongo{
 		Id:              domainComparison.Id,
 		Name:            domainComparison.Name,
 		CreatedAt:       domainComparison.CreatedAt,
@@ -150,8 +150,8 @@ func toComparisonMongo(domainComparison *domain.Comparison) *comparisonMongo {
 	}
 }
 
-func toDomainComparison(cm *comparisonMongo) *domain.Comparison {
-	return &domain.Comparison{
+func toDomainComparison(cm comparisonMongo) domain.Comparison {
+	return domain.Comparison{
 		Id:              cm.Id,
 		Name:            cm.Name,
 		CreatedAt:       cm.CreatedAt,
