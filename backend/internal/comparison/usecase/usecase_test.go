@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"context"
-	"errors"
 	"testing"
 	"time"
 
@@ -44,7 +43,7 @@ func TestGetComparisons(t *testing.T) {
 		comparisons, err := uc.GetComparisons(ctx, filter)
 
 		assert.NoError(t, err)
-		assert.Equal(t, comparisons, returnedComparisons)
+		assert.Equal(t, returnedComparisons, comparisons)
 		repo.AssertExpectations(t)
 	})
 
@@ -59,7 +58,7 @@ func TestGetComparisons(t *testing.T) {
 			Offset: 0,
 		}
 
-		repo.On("GetComparisons", ctx, filter).Return(nil, errors.New("some error"))
+		repo.On("GetComparisons", ctx, filter).Return(nil, assert.AnError)
 
 		comparisons, err := uc.GetComparisons(ctx, filter)
 
@@ -90,7 +89,7 @@ func TestGetComparisonById(t *testing.T) {
 		comparison, err := uc.GetComparisonById(ctx, id)
 
 		assert.NoError(t, err)
-		assert.Equal(t, comparison, returnedComparison)
+		assert.Equal(t, returnedComparison, comparison)
 		repo.AssertExpectations(t)
 	})
 
@@ -161,7 +160,7 @@ func TestCreateComparison(t *testing.T) {
 		ctx := context.Background()
 
 		generator.On("GenerateId").Return("32939fsdfsdf912312")
-		repo.On("CreateComparison", ctx, changedComparison).Return(errors.New("some error"))
+		repo.On("CreateComparison", ctx, changedComparison).Return(assert.AnError)
 
 		err := uc.CreateComparison(ctx, inputComparison)
 
@@ -237,7 +236,7 @@ func TestUpdateComparison(t *testing.T) {
 		}
 
 		repo.On("GetComparisonById", ctx, id).Return(returnedComparison, nil)
-		repo.On("UpdateComparison", ctx, changedComparison).Return(errors.New("some error"))
+		repo.On("UpdateComparison", ctx, changedComparison).Return(assert.AnError)
 
 		err := uc.UpdateComparison(ctx, id, inputComparison)
 
@@ -271,7 +270,7 @@ func TestDeleteComparison(t *testing.T) {
 		ctx := context.Background()
 		id := "92133easd123srewr132"
 
-		repo.On("DeleteComparison", ctx, id).Return(errors.New("some error"))
+		repo.On("DeleteComparison", ctx, id).Return(assert.AnError)
 
 		err := uc.DeleteComparison(ctx, id)
 
