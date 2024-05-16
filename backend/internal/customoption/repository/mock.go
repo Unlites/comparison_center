@@ -17,16 +17,16 @@ func NewCustomOptionRepositoryMock() *customOptionRepositoryMock {
 
 func (repo *customOptionRepositoryMock) GetCustomOptions(
 	ctx context.Context,
-	filter *domain.CustomOptionFilter,
-) ([]*domain.CustomOption, error) {
+	filter domain.CustomOptionFilter,
+) ([]domain.CustomOption, error) {
 	args := repo.Called(ctx, filter)
 
 	ret, err := args.Get(0), args.Error(1)
 
-	var customOptions []*domain.CustomOption
+	var customOptions []domain.CustomOption
 
 	if ret != nil {
-		customOptions = ret.([]*domain.CustomOption)
+		customOptions = ret.([]domain.CustomOption)
 	}
 
 	return customOptions, err
@@ -35,15 +35,15 @@ func (repo *customOptionRepositoryMock) GetCustomOptions(
 func (repo *customOptionRepositoryMock) GetCustomOptionById(
 	ctx context.Context,
 	id string,
-) (*domain.CustomOption, error) {
+) (domain.CustomOption, error) {
 	args := repo.Called(ctx, id)
 
 	ret, err := args.Get(0), args.Error(1)
 
-	var customOption *domain.CustomOption
+	var customOption domain.CustomOption
 
 	if ret != nil {
-		customOption = ret.(*domain.CustomOption)
+		customOption = ret.(domain.CustomOption)
 	}
 
 	return customOption, err
@@ -51,7 +51,7 @@ func (repo *customOptionRepositoryMock) GetCustomOptionById(
 
 func (repo *customOptionRepositoryMock) UpdateCustomOption(
 	ctx context.Context,
-	customOption *domain.CustomOption,
+	customOption domain.CustomOption,
 ) error {
 	args := repo.Called(ctx, customOption)
 
@@ -60,7 +60,7 @@ func (repo *customOptionRepositoryMock) UpdateCustomOption(
 
 func (repo *customOptionRepositoryMock) CreateCustomOption(
 	ctx context.Context,
-	customOption *domain.CustomOption,
+	customOption domain.CustomOption,
 ) error {
 	args := repo.Called(ctx, customOption)
 
@@ -73,5 +73,5 @@ func (repo *customOptionRepositoryMock) DeleteCustomOption(
 ) error {
 	args := repo.Called(ctx, id)
 
-	return args.Error(1)
+	return args.Error(0)
 }

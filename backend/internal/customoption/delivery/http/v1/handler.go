@@ -7,8 +7,10 @@ import (
 	"net/url"
 	"strconv"
 
+	"github.com/Unlites/comparison_center/backend/internal/customoption/usecase"
 	"github.com/Unlites/comparison_center/backend/internal/domain"
 	hu "github.com/Unlites/comparison_center/backend/internal/utils/http"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	v "github.com/go-ozzo/ozzo-validation"
@@ -16,10 +18,10 @@ import (
 
 type CustomOptionHandler struct {
 	router http.Handler
-	uc     domain.CustomOptionUsecase
+	uc     usecase.CustomOptionUsecase
 }
 
-func NewCustomOptionHandler(uc domain.CustomOptionUsecase) *CustomOptionHandler {
+func NewCustomOptionHandler(uc usecase.CustomOptionUsecase) *CustomOptionHandler {
 	router := chi.NewRouter()
 	handler := &CustomOptionHandler{router: router, uc: uc}
 
@@ -62,7 +64,7 @@ func (h *CustomOptionHandler) GetCustomOptions(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	customOptionResponses := make([]*customOptionResponse, len(customOptions))
+	customOptionResponses := make([]customOptionResponse, len(customOptions))
 	for i, co := range customOptions {
 		customOptionResponses[i] = toCustomOptionResponse(co)
 	}
@@ -122,7 +124,7 @@ func (h *CustomOptionHandler) CreateCustomOption(w http.ResponseWriter, r *http.
 		return
 	}
 
-	err := h.uc.CreateCustomOption(r.Context(), &domain.CustomOption{Name: input.Name})
+	err := h.uc.CreateCustomOption(r.Context(), domain.CustomOption{Name: input.Name})
 	if err != nil {
 		hu.FailureResponse(
 			w, r,
@@ -167,7 +169,7 @@ func (h *CustomOptionHandler) UpdateCustomOption(w http.ResponseWriter, r *http.
 		return
 	}
 
-	err := h.uc.UpdateCustomOption(r.Context(), id, &domain.CustomOption{
+	err := h.uc.UpdateCustomOption(r.Context(), id, domain.CustomOption{
 		Name: input.Name,
 	})
 	if err != nil {
@@ -209,7 +211,7 @@ func (h *CustomOptionHandler) DeleteCustomOption(w http.ResponseWriter, r *http.
 	hu.SuccessResponse(w, r, nil)
 }
 
-func (h *CustomOptionHandler) getFilter(params url.Values) (*domain.CustomOptionFilter, error) {
+func (h *CustomOptionHandler) getFilter(params url.Values) (domain.CustomOptionFilter, error) {
 	var limit int
 	var offset int
 	var name string
@@ -220,7 +222,7 @@ func (h *CustomOptionHandler) getFilter(params url.Values) (*domain.CustomOption
 	if limitStr != "" {
 		limit, err = strconv.Atoi(limitStr)
 		if err != nil {
-			return nil, fmt.Errorf("incorrect limit value")
+			return domain.CustomOptionFilter{}, fmt.Errorf("incorrect limit value")
 		}
 	}
 
@@ -228,7 +230,7 @@ func (h *CustomOptionHandler) getFilter(params url.Values) (*domain.CustomOption
 	if offsetStr != "" {
 		offset, err = strconv.Atoi(offsetStr)
 		if err != nil {
-			return nil, fmt.Errorf("incorrect offset value")
+			return domain.CustomOptionFilter{}, fmt.Errorf("incorrect offset value")
 		}
 	}
 
@@ -237,8 +239,8 @@ func (h *CustomOptionHandler) getFilter(params url.Values) (*domain.CustomOption
 	return domain.NewCustomOptionFilter(limit, offset, name)
 }
 
-func toCustomOptionResponse(customOption *domain.CustomOption) *customOptionResponse {
-	return &customOptionResponse{
+func toCustomOptionResponse(customOption domain.CustomOption) customOptionResponse {
+	return customOptionResponse{
 		Id:   customOption.Id,
 		Name: customOption.Name,
 	}

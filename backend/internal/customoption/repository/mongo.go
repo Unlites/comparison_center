@@ -28,7 +28,7 @@ func NewCustomOptionRepositoryMongo(client *mongo.Client) *customOptionRepositor
 
 func (repo *customOptionRepositoryMongo) CreateCustomOption(
 	ctx context.Context,
-	customOption *domain.CustomOption,
+	customOption domain.CustomOption,
 ) error {
 	_, err := repo.customOptionsColl.InsertOne(ctx, toCustomOptionMongo(customOption))
 	if err != nil {
@@ -49,19 +49,19 @@ func (repo *customOptionRepositoryMongo) CreateCustomOption(
 func (repo *customOptionRepositoryMongo) GetCustomOptionById(
 	ctx context.Context,
 	id string,
-) (*domain.CustomOption, error) {
+) (domain.CustomOption, error) {
 	res := repo.customOptionsColl.FindOne(ctx, bson.M{"_id": id})
 	if res.Err() != nil {
 		if errors.Is(res.Err(), mongo.ErrNoDocuments) {
-			return nil, fmt.Errorf("custom option %w", domain.ErrNotFound)
+			return domain.CustomOption{}, fmt.Errorf("custom option %w", domain.ErrNotFound)
 		}
 
-		return nil, fmt.Errorf("get custom option from mongo error %w", res.Err())
+		return domain.CustomOption{}, fmt.Errorf("get custom option from mongo error %w", res.Err())
 	}
 
-	com := new(customOptionMongo)
+	var com customOptionMongo
 	if err := res.Decode(com); err != nil {
-		return nil, fmt.Errorf("decode mongo result error %w", err)
+		return domain.CustomOption{}, fmt.Errorf("decode mongo result error %w", err)
 	}
 
 	return toDomainCustomOption(com), nil
@@ -69,8 +69,8 @@ func (repo *customOptionRepositoryMongo) GetCustomOptionById(
 
 func (repo *customOptionRepositoryMongo) GetCustomOptions(
 	ctx context.Context,
-	filter *domain.CustomOptionFilter,
-) ([]*domain.CustomOption, error) {
+	filter domain.CustomOptionFilter,
+) ([]domain.CustomOption, error) {
 	opts := options.Find().
 		SetSkip(int64(filter.Offset)).
 		SetLimit(int64(filter.Limit))
@@ -86,9 +86,9 @@ func (repo *customOptionRepositoryMongo) GetCustomOptions(
 		return nil, fmt.Errorf("fetch custom options from mongo error: %w", err)
 	}
 
-	customOptions := make([]*domain.CustomOption, 0, filter.Limit)
+	customOptions := make([]domain.CustomOption, 0, filter.Limit)
 	for cur.Next(ctx) {
-		com := new(customOptionMongo)
+		var com customOptionMongo
 		if err := cur.Decode(com); err != nil {
 			return nil, fmt.Errorf("decode mongo result error %w", err)
 		}
@@ -101,7 +101,7 @@ func (repo *customOptionRepositoryMongo) GetCustomOptions(
 
 func (repo *customOptionRepositoryMongo) UpdateCustomOption(
 	ctx context.Context,
-	customOption *domain.CustomOption,
+	customOption domain.CustomOption,
 ) error {
 	res, err := repo.customOptionsColl.UpdateOne(
 		ctx,
@@ -143,15 +143,15 @@ func (repo *customOptionRepositoryMongo) DeleteCustomOption(
 	return nil
 }
 
-func toCustomOptionMongo(domainCustomOption *domain.CustomOption) *customOptionMongo {
-	return &customOptionMongo{
+func toCustomOptionMongo(domainCustomOption domain.CustomOption) customOptionMongo {
+	return customOptionMongo{
 		Id:   domainCustomOption.Id,
 		Name: domainCustomOption.Name,
 	}
 }
 
-func toDomainCustomOption(com *customOptionMongo) *domain.CustomOption {
-	return &domain.CustomOption{
+func toDomainCustomOption(com customOptionMongo) domain.CustomOption {
+	return domain.CustomOption{
 		Id:   com.Id,
 		Name: com.Name,
 	}

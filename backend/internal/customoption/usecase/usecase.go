@@ -5,21 +5,44 @@ import (
 	"fmt"
 
 	"github.com/Unlites/comparison_center/backend/internal/domain"
-	"github.com/google/uuid"
 )
 
 type customOptionUsecase struct {
-	repo domain.CustomOptionRepository
+	repo      CustomOptionRepository
+	generator IdGenerator
 }
 
-func NewCustomOptionUsecase(repo domain.CustomOptionRepository) *customOptionUsecase {
-	return &customOptionUsecase{repo: repo}
+type CustomOptionUsecase interface {
+	GetCustomOptions(ctx context.Context, filter domain.CustomOptionFilter) ([]domain.CustomOption, error)
+	GetCustomOptionById(ctx context.Context, id string) (domain.CustomOption, error)
+	UpdateCustomOption(ctx context.Context, id string, customOption domain.CustomOption) error
+	CreateCustomOption(ctx context.Context, customOption domain.CustomOption) error
+	DeleteCustomOption(ctx context.Context, id string) error
+}
+
+type CustomOptionRepository interface {
+	GetCustomOptions(ctx context.Context, filter domain.CustomOptionFilter) ([]domain.CustomOption, error)
+	GetCustomOptionById(ctx context.Context, id string) (domain.CustomOption, error)
+	UpdateCustomOption(ctx context.Context, customOption domain.CustomOption) error
+	CreateCustomOption(ctx context.Context, customOption domain.CustomOption) error
+	DeleteCustomOption(ctx context.Context, id string) error
+}
+
+type IdGenerator interface {
+	GenerateId() string
+}
+
+func NewCustomOptionUsecase(
+	repo CustomOptionRepository,
+	generator IdGenerator,
+) *customOptionUsecase {
+	return &customOptionUsecase{repo: repo, generator: generator}
 }
 
 func (uc *customOptionUsecase) GetCustomOptions(
 	ctx context.Context,
-	filter *domain.CustomOptionFilter,
-) ([]*domain.CustomOption, error) {
+	filter domain.CustomOptionFilter,
+) ([]domain.CustomOption, error) {
 	customOptions, err := uc.repo.GetCustomOptions(ctx, filter)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get custom options - %w", err)
@@ -31,10 +54,10 @@ func (uc *customOptionUsecase) GetCustomOptions(
 func (uc *customOptionUsecase) GetCustomOptionById(
 	ctx context.Context,
 	id string,
-) (*domain.CustomOption, error) {
+) (domain.CustomOption, error) {
 	customOption, err := uc.repo.GetCustomOptionById(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get custom option - %w", err)
+		return domain.CustomOption{}, fmt.Errorf("failed to get custom option - %w", err)
 	}
 
 	return customOption, nil
@@ -43,7 +66,7 @@ func (uc *customOptionUsecase) GetCustomOptionById(
 func (uc *customOptionUsecase) UpdateCustomOption(
 	ctx context.Context,
 	id string,
-	customOption *domain.CustomOption,
+	customOption domain.CustomOption,
 ) error {
 	existingCustomOption, err := uc.repo.GetCustomOptionById(ctx, id)
 	if err != nil {
@@ -61,9 +84,9 @@ func (uc *customOptionUsecase) UpdateCustomOption(
 
 func (uc *customOptionUsecase) CreateCustomOption(
 	ctx context.Context,
-	customOption *domain.CustomOption,
+	customOption domain.CustomOption,
 ) error {
-	customOption.Id = uuid.NewString()
+	customOption.Id = uc.generator.GenerateId()
 	if err := uc.repo.CreateCustomOption(ctx, customOption); err != nil {
 		return fmt.Errorf("failed to create custom option - %w", err)
 	}

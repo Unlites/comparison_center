@@ -44,7 +44,7 @@ func NewApp(ctx context.Context, log *slog.Logger, cfg *config.Config) (*App, er
 	comparisonHandler := ch.NewComparisonHandler(comparisonUsecase)
 
 	customOptionRepository := cor.NewCustomOptionRepositoryMongo(client)
-	customOptionUsecase := cou.NewCustomOptionUsecase(customOptionRepository)
+	customOptionUsecase := cou.NewCustomOptionUsecase(customOptionRepository, generator)
 	customOptionHandler := coh.NewCustomOptionHandler(customOptionUsecase)
 
 	objectRepository := or.NewObjectRepositoryMongo(client)
