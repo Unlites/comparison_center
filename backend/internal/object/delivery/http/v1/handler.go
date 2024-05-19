@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/Unlites/comparison_center/backend/internal/domain"
+	"github.com/Unlites/comparison_center/backend/internal/object/usecase"
 	hu "github.com/Unlites/comparison_center/backend/internal/utils/http"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
@@ -24,10 +25,10 @@ type ObjectHandler struct {
 	router        http.Handler
 	maxUploadSize int64
 	photosDir     string
-	uc            domain.ObjectUsecase
+	uc            usecase.ObjectUsecase
 }
 
-func NewObjectHandler(uc domain.ObjectUsecase, photosDir string, maxSize int64) *ObjectHandler {
+func NewObjectHandler(uc usecase.ObjectUsecase, photosDir string, maxSize int64) *ObjectHandler {
 	router := chi.NewRouter()
 	handler := &ObjectHandler{
 		router:        router,
@@ -84,7 +85,7 @@ func (h *ObjectHandler) GetObjects(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	objectResponses := make([]*objectResponse, len(objects))
+	objectResponses := make([]objectResponse, len(objects))
 	for i, o := range objects {
 		objectResponses[i] = toObjectResponse(o)
 	}
@@ -156,7 +157,7 @@ func (h *ObjectHandler) CreateObject(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, err := h.uc.CreateObject(r.Context(), &domain.Object{
+	id, err := h.uc.CreateObject(r.Context(), domain.Object{
 		Name:         input.Name,
 		Rating:       input.Rating,
 		Advs:         input.Advs,
@@ -218,16 +219,16 @@ func (h *ObjectHandler) UpdateObject(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	objCustOpts := make([]*domain.ObjectCustomOption, len(input.CustomOptions))
+	objCustOpts := make([]domain.ObjectCustomOption, len(input.CustomOptions))
 	for i, opt := range input.CustomOptions {
-		objCustOpts[i] = &domain.ObjectCustomOption{
+		objCustOpts[i] = domain.ObjectCustomOption{
 			ObjectId:       id,
 			CustomOptionId: opt["id"],
 			Value:          opt["value"],
 		}
 	}
 
-	err := h.uc.UpdateObject(r.Context(), id, &domain.Object{
+	err := h.uc.UpdateObject(r.Context(), id, domain.Object{
 		Name:                input.Name,
 		Rating:              input.Rating,
 		Advs:                input.Advs,
@@ -415,7 +416,7 @@ func (h *ObjectHandler) GetObjectPhoto(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "image/jpeg")
 }
 
-func (h *ObjectHandler) getFilter(params url.Values) (*domain.ObjectFilter, error) {
+func (h *ObjectHandler) getFilter(params url.Values) (domain.ObjectFilter, error) {
 	var limit int
 	var offset int
 	var name string
@@ -427,7 +428,7 @@ func (h *ObjectHandler) getFilter(params url.Values) (*domain.ObjectFilter, erro
 	if limitStr != "" {
 		limit, err = strconv.Atoi(limitStr)
 		if err != nil {
-			return nil, fmt.Errorf("incorrect limit value")
+			return domain.ObjectFilter{}, fmt.Errorf("incorrect limit value")
 		}
 	}
 
@@ -435,7 +436,7 @@ func (h *ObjectHandler) getFilter(params url.Values) (*domain.ObjectFilter, erro
 	if offsetStr != "" {
 		offset, err = strconv.Atoi(offsetStr)
 		if err != nil {
-			return nil, fmt.Errorf("incorrect offset value")
+			return domain.ObjectFilter{}, fmt.Errorf("incorrect offset value")
 		}
 	}
 
@@ -446,7 +447,7 @@ func (h *ObjectHandler) getFilter(params url.Values) (*domain.ObjectFilter, erro
 	return domain.NewObjectFilter(limit, offset, orderBy, name, comparisonId)
 }
 
-func toObjectResponse(object *domain.Object) *objectResponse {
+func toObjectResponse(object domain.Object) objectResponse {
 	customOpts := make([]map[string]string, len(object.ObjectCustomOptions))
 	for i, co := range object.ObjectCustomOptions {
 		customOpts[i] = map[string]string{
@@ -454,7 +455,7 @@ func toObjectResponse(object *domain.Object) *objectResponse {
 			"value": co.Value,
 		}
 	}
-	return &objectResponse{
+	return objectResponse{
 		Id:            object.Id,
 		Name:          object.Name,
 		Rating:        object.Rating,

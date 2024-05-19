@@ -1,7 +1,6 @@
 package domain
 
 import (
-	"context"
 	"fmt"
 	"slices"
 	"time"
@@ -16,7 +15,7 @@ type Object struct {
 	Disadvs             string
 	PhotoPath           string
 	ComparisonId        string
-	ObjectCustomOptions []*ObjectCustomOption
+	ObjectCustomOptions []ObjectCustomOption
 }
 
 type ObjectFilter struct {
@@ -29,9 +28,9 @@ type ObjectFilter struct {
 
 var providedObjectOrderings = []string{"created_at", "name", "rating"}
 
-func NewObjectFilter(limit, offset int, orderBy, name, comparisonId string) (*ObjectFilter, error) {
+func NewObjectFilter(limit, offset int, orderBy, name, comparisonId string) (ObjectFilter, error) {
 	if offset < 0 || limit < 0 {
-		return nil, fmt.Errorf("offset amd limit must not be less than zero")
+		return ObjectFilter{}, fmt.Errorf("offset amd limit must not be less than zero")
 	}
 
 	if limit == 0 {
@@ -43,30 +42,13 @@ func NewObjectFilter(limit, offset int, orderBy, name, comparisonId string) (*Ob
 	}
 
 	if !slices.Contains(providedObjectOrderings, orderBy) {
-		return nil, fmt.Errorf("incorrect ordering value")
+		return ObjectFilter{}, fmt.Errorf("incorrect ordering value")
 	}
 
-	return &ObjectFilter{
+	return ObjectFilter{
 		Limit:   limit,
 		Offset:  offset,
 		Name:    name,
 		OrderBy: orderBy,
 	}, nil
-}
-
-type ObjectUsecase interface {
-	GetObjects(ctx context.Context, filter *ObjectFilter) ([]*Object, error)
-	GetObjectById(ctx context.Context, id string) (*Object, error)
-	UpdateObject(ctx context.Context, id string, object *Object) error
-	CreateObject(ctx context.Context, object *Object) (string, error)
-	DeleteObject(ctx context.Context, id string) error
-	SetObjectPhotoPath(ctx context.Context, id, path string) error
-}
-
-type ObjectRepository interface {
-	GetObjects(ctx context.Context, filter *ObjectFilter) ([]*Object, error)
-	GetObjectById(ctx context.Context, id string) (*Object, error)
-	UpdateObject(ctx context.Context, object *Object) error
-	CreateObject(ctx context.Context, object *Object) error
-	DeleteObject(ctx context.Context, id string) error
 }

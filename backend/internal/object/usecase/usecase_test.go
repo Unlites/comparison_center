@@ -2,19 +2,24 @@ package usecase
 
 import (
 	"context"
-	"errors"
 	"testing"
 	"time"
 
 	"github.com/Unlites/comparison_center/backend/internal/domain"
 	or "github.com/Unlites/comparison_center/backend/internal/object/repository"
 	cr "github.com/Unlites/comparison_center/backend/internal/object_customoption/repository"
+	g "github.com/Unlites/comparison_center/backend/pkg/generator"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 func TestGetObjects(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
-		returnedObjects := []*domain.Object{
+		objRepo := or.NewObjectRepositoryMock()
+		custOptObjRepo := cr.NewObjectCustomOptionRepositoryMock()
+		generator := g.NewMockGenerator()
+		uc := NewObjectUsecase(objRepo, custOptObjRepo, generator)
+		returnedObjects := []domain.Object{
 			{
 				Id:           "231934sadas9123deqw",
 				Name:         "BMW X5",
@@ -27,7 +32,7 @@ func TestGetObjects(t *testing.T) {
 			},
 		}
 
-		returnedOptions := []*domain.ObjectCustomOption{
+		returnedOptions := []domain.ObjectCustomOption{
 			{
 				ObjectId:       "231934sadas9123deqw",
 				CustomOptionId: "432230ewrew3424rwe",
@@ -40,12 +45,8 @@ func TestGetObjects(t *testing.T) {
 			},
 		}
 
-		objRepo := or.NewObjectRepositoryMock()
-		custOptObjRepo := cr.NewObjectCustomOptionRepositoryMock()
-		uc := NewObjectUsecase(objRepo, custOptObjRepo)
-
 		ctx := context.Background()
-		filter := &domain.ObjectFilter{
+		filter := domain.ObjectFilter{
 			Limit:   2,
 			Offset:  0,
 			OrderBy: "created",
@@ -57,8 +58,8 @@ func TestGetObjects(t *testing.T) {
 		objects, err := uc.GetObjects(ctx, filter)
 
 		assert.NoError(t, err)
-		assert.Equal(t, objects, returnedObjects)
-		assert.Equal(t, returnedOptions, returnedObjects[0].ObjectCustomOptions)
+		assert.Equal(t, returnedObjects, objects)
+		assert.Equal(t, returnedOptions, objects[0].ObjectCustomOptions)
 		objRepo.AssertExpectations(t)
 		custOptObjRepo.AssertExpectations(t)
 	})
@@ -66,15 +67,16 @@ func TestGetObjects(t *testing.T) {
 	t.Run("Error", func(t *testing.T) {
 		objRepo := or.NewObjectRepositoryMock()
 		custOptObjRepo := cr.NewObjectCustomOptionRepositoryMock()
-		uc := NewObjectUsecase(objRepo, custOptObjRepo)
+		generator := g.NewMockGenerator()
+		uc := NewObjectUsecase(objRepo, custOptObjRepo, generator)
 
 		ctx := context.Background()
-		filter := &domain.ObjectFilter{
+		filter := domain.ObjectFilter{
 			Limit:  2,
 			Offset: 0,
 		}
 
-		objRepo.On("GetObjects", ctx, filter).Return(nil, errors.New("some error"))
+		objRepo.On("GetObjects", ctx, filter).Return(nil, assert.AnError)
 		objects, err := uc.GetObjects(ctx, filter)
 
 		assert.Error(t, err)
@@ -86,8 +88,12 @@ func TestGetObjects(t *testing.T) {
 
 func TestGetObjectById(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
-		returnedObject := &domain.Object{
+		objRepo := or.NewObjectRepositoryMock()
+		custOptObjRepo := cr.NewObjectCustomOptionRepositoryMock()
+		generator := g.NewMockGenerator()
+		uc := NewObjectUsecase(objRepo, custOptObjRepo, generator)
 
+		returnedObject := domain.Object{
 			Id:           "231934sadas9123deqw",
 			Name:         "BMW X5",
 			Rating:       8,
@@ -98,7 +104,7 @@ func TestGetObjectById(t *testing.T) {
 			ComparisonId: "85434230werhuhi123912304",
 		}
 
-		returnedOptions := []*domain.ObjectCustomOption{
+		returnedOptions := []domain.ObjectCustomOption{
 			{
 				ObjectId:       "231934sadas9123deqw",
 				CustomOptionId: "432230ewrew3424rwe",
@@ -111,9 +117,8 @@ func TestGetObjectById(t *testing.T) {
 			},
 		}
 
-		objRepo := or.NewObjectRepositoryMock()
-		custOptObjRepo := cr.NewObjectCustomOptionRepositoryMock()
-		uc := NewObjectUsecase(objRepo, custOptObjRepo)
+		returnedObjectWithOptions := returnedObject
+		returnedObjectWithOptions.ObjectCustomOptions = returnedOptions
 
 		ctx := context.Background()
 		id := "231934sadas9123deqw"
@@ -124,8 +129,7 @@ func TestGetObjectById(t *testing.T) {
 		object, err := uc.GetObjectById(ctx, id)
 
 		assert.NoError(t, err)
-		assert.Equal(t, object, returnedObject)
-		assert.Equal(t, returnedOptions, returnedObject.ObjectCustomOptions)
+		assert.Equal(t, returnedObjectWithOptions, object)
 
 		objRepo.AssertExpectations(t)
 		custOptObjRepo.AssertExpectations(t)
@@ -134,7 +138,8 @@ func TestGetObjectById(t *testing.T) {
 	t.Run("Error", func(t *testing.T) {
 		objRepo := or.NewObjectRepositoryMock()
 		custOptObjRepo := cr.NewObjectCustomOptionRepositoryMock()
-		uc := NewObjectUsecase(objRepo, custOptObjRepo)
+		generator := g.NewMockGenerator()
+		uc := NewObjectUsecase(objRepo, custOptObjRepo, generator)
 
 		ctx := context.Background()
 		id := "213213ewrwe9423432"
@@ -144,7 +149,7 @@ func TestGetObjectById(t *testing.T) {
 		object, err := uc.GetObjectById(ctx, id)
 
 		assert.Error(t, err)
-		assert.Nil(t, object)
+		assert.Empty(t, object)
 		objRepo.AssertExpectations(t)
 		custOptObjRepo.AssertNotCalled(t, "GetObjectCustomOptionsByObjectId")
 	})
@@ -152,7 +157,12 @@ func TestGetObjectById(t *testing.T) {
 
 func TestCreateObject(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
-		inputObject := &domain.Object{
+		objRepo := or.NewObjectRepositoryMock()
+		custOptObjRepo := cr.NewObjectCustomOptionRepositoryMock()
+		generator := g.NewMockGenerator()
+		uc := NewObjectUsecase(objRepo, custOptObjRepo, generator)
+
+		inputObject := domain.Object{
 			Name:         "BMW X5",
 			Rating:       8,
 			CreatedAt:    time.Now(),
@@ -162,23 +172,32 @@ func TestCreateObject(t *testing.T) {
 			ComparisonId: "85434230werhuhi123912304",
 		}
 
-		objRepo := or.NewObjectRepositoryMock()
-		custOptObjRepo := cr.NewObjectCustomOptionRepositoryMock()
-		uc := NewObjectUsecase(objRepo, custOptObjRepo)
-
 		ctx := context.Background()
 
-		objRepo.On("CreateObject", ctx, inputObject).Return(nil)
+		objRepo.On("CreateObject", ctx, mock.MatchedBy(func(object domain.Object) bool {
+			return object.Name == inputObject.Name &&
+				object.Rating == inputObject.Rating &&
+				object.Advs == inputObject.Advs &&
+				object.Disadvs == inputObject.Disadvs &&
+				object.PhotoPath == inputObject.PhotoPath &&
+				object.ComparisonId == inputObject.ComparisonId
+		})).Return(nil)
+		generator.On("GenerateId").Return("231934sadas9123deqw")
 
 		id, err := uc.CreateObject(ctx, inputObject)
 
-		assert.NotEmpty(t, id)
+		assert.Equal(t, "231934sadas9123deqw", id)
 		assert.NoError(t, err)
 		objRepo.AssertExpectations(t)
 	})
 
 	t.Run("Error", func(t *testing.T) {
-		inputObject := &domain.Object{
+		objRepo := or.NewObjectRepositoryMock()
+		custOptObjRepo := cr.NewObjectCustomOptionRepositoryMock()
+		generator := g.NewMockGenerator()
+		uc := NewObjectUsecase(objRepo, custOptObjRepo, generator)
+
+		inputObject := domain.Object{
 			Name:         "BMW X5",
 			Rating:       8,
 			CreatedAt:    time.Now(),
@@ -188,13 +207,17 @@ func TestCreateObject(t *testing.T) {
 			ComparisonId: "85434230werhuhi123912304",
 		}
 
-		objRepo := or.NewObjectRepositoryMock()
-		custOptObjRepo := cr.NewObjectCustomOptionRepositoryMock()
-		uc := NewObjectUsecase(objRepo, custOptObjRepo)
-
 		ctx := context.Background()
 
-		objRepo.On("CreateObject", ctx, inputObject).Return(errors.New("some error"))
+		objRepo.On("CreateObject", ctx, mock.MatchedBy(func(object domain.Object) bool {
+			return object.Name == inputObject.Name &&
+				object.Rating == inputObject.Rating &&
+				object.Advs == inputObject.Advs &&
+				object.Disadvs == inputObject.Disadvs &&
+				object.PhotoPath == inputObject.PhotoPath &&
+				object.ComparisonId == inputObject.ComparisonId
+		})).Return(assert.AnError)
+		generator.On("GenerateId").Return("231934sadas9123deqw")
 
 		id, err := uc.CreateObject(ctx, inputObject)
 
@@ -206,7 +229,12 @@ func TestCreateObject(t *testing.T) {
 
 func TestUpdateObject(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
-		returnedOnGetObject := &domain.Object{
+		objRepo := or.NewObjectRepositoryMock()
+		custOptObjRepo := cr.NewObjectCustomOptionRepositoryMock()
+		generator := g.NewMockGenerator()
+		uc := NewObjectUsecase(objRepo, custOptObjRepo, generator)
+
+		returnedOnGetObject := domain.Object{
 			Id:           "231934sadas9123deqw",
 			Name:         "BMW X5",
 			Rating:       8,
@@ -215,7 +243,7 @@ func TestUpdateObject(t *testing.T) {
 			Disadvs:      "Hard to find some details",
 			PhotoPath:    "/cars/231934sadas9123deqw.jpg",
 			ComparisonId: "85434230werhuhi123912304",
-			ObjectCustomOptions: []*domain.ObjectCustomOption{
+			ObjectCustomOptions: []domain.ObjectCustomOption{
 				{
 					ObjectId:       "231934sadas9123deqw",
 					CustomOptionId: "432230ewrew3424rwe",
@@ -224,7 +252,7 @@ func TestUpdateObject(t *testing.T) {
 			},
 		}
 
-		inputObject := &domain.Object{
+		inputObject := domain.Object{
 			Name:         "BMW X5",
 			Rating:       9,
 			CreatedAt:    time.Now(),
@@ -232,7 +260,7 @@ func TestUpdateObject(t *testing.T) {
 			Disadvs:      "Easy to find some details",
 			PhotoPath:    "/cars/231934sadas9123deqw.jpg",
 			ComparisonId: "85434230werhuhi123912304",
-			ObjectCustomOptions: []*domain.ObjectCustomOption{
+			ObjectCustomOptions: []domain.ObjectCustomOption{
 				{
 					CustomOptionId: "432230ewrew3424rwe",
 					Value:          "800",
@@ -240,16 +268,16 @@ func TestUpdateObject(t *testing.T) {
 			},
 		}
 
-		id := "231934sadas9123deqw"
+		changedObject := inputObject
+		changedObject.Id = returnedOnGetObject.Id
+		changedObject.ObjectCustomOptions[0].ObjectId = returnedOnGetObject.Id
 
-		objRepo := or.NewObjectRepositoryMock()
-		custOptObjRepo := cr.NewObjectCustomOptionRepositoryMock()
-		uc := NewObjectUsecase(objRepo, custOptObjRepo)
+		id := "231934sadas9123deqw"
 
 		ctx := context.Background()
 
 		objRepo.On("GetObjectById", ctx, id).Return(returnedOnGetObject, nil)
-		objRepo.On("UpdateObject", ctx, inputObject).Return(nil)
+		objRepo.On("UpdateObject", ctx, changedObject).Return(nil)
 
 		custOptObjRepo.On("GetObjectCustomOptionsByObjectId", ctx, returnedOnGetObject.Id).
 			Return(returnedOnGetObject.ObjectCustomOptions, nil)
@@ -264,7 +292,12 @@ func TestUpdateObject(t *testing.T) {
 	})
 
 	t.Run("Error", func(t *testing.T) {
-		inputObject := &domain.Object{
+		objRepo := or.NewObjectRepositoryMock()
+		custOptObjRepo := cr.NewObjectCustomOptionRepositoryMock()
+		generator := g.NewMockGenerator()
+		uc := NewObjectUsecase(objRepo, custOptObjRepo, generator)
+
+		inputObject := domain.Object{
 			Name:         "BMW X5",
 			Rating:       9,
 			CreatedAt:    time.Now(),
@@ -272,7 +305,7 @@ func TestUpdateObject(t *testing.T) {
 			Disadvs:      "Easy to find some details",
 			PhotoPath:    "/cars/231934sadas9123deqw.jpg",
 			ComparisonId: "85434230werhuhi123912304",
-			ObjectCustomOptions: []*domain.ObjectCustomOption{
+			ObjectCustomOptions: []domain.ObjectCustomOption{
 				{
 					CustomOptionId: "432230ewrew3424rwe",
 					Value:          "800",
@@ -282,13 +315,9 @@ func TestUpdateObject(t *testing.T) {
 
 		id := "231934sadas9123deqw"
 
-		objRepo := or.NewObjectRepositoryMock()
-		custOptObjRepo := cr.NewObjectCustomOptionRepositoryMock()
-		uc := NewObjectUsecase(objRepo, custOptObjRepo)
-
 		ctx := context.Background()
 
-		objRepo.On("GetObjectById", ctx, id).Return(nil, errors.New("some error"))
+		objRepo.On("GetObjectById", ctx, id).Return(nil, assert.AnError)
 
 		err := uc.UpdateObject(ctx, id, inputObject)
 
@@ -304,7 +333,8 @@ func TestDeleteObject(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
 		objRepo := or.NewObjectRepositoryMock()
 		custOptObjRepo := cr.NewObjectCustomOptionRepositoryMock()
-		uc := NewObjectUsecase(objRepo, custOptObjRepo)
+		generator := g.NewMockGenerator()
+		uc := NewObjectUsecase(objRepo, custOptObjRepo, generator)
 
 		ctx := context.Background()
 		id := "34543dfsdfj32432jewr"
@@ -320,11 +350,13 @@ func TestDeleteObject(t *testing.T) {
 	t.Run("Error", func(t *testing.T) {
 		objRepo := or.NewObjectRepositoryMock()
 		custOptObjRepo := cr.NewObjectCustomOptionRepositoryMock()
-		uc := NewObjectUsecase(objRepo, custOptObjRepo)
+		generator := g.NewMockGenerator()
+		uc := NewObjectUsecase(objRepo, custOptObjRepo, generator)
+
 		ctx := context.Background()
 		id := "92133easd123srewr132"
 
-		objRepo.On("DeleteObject", ctx, id).Return(errors.New("some error"))
+		objRepo.On("DeleteObject", ctx, id).Return(assert.AnError)
 
 		err := uc.DeleteObject(ctx, id)
 
@@ -335,7 +367,12 @@ func TestDeleteObject(t *testing.T) {
 
 func TestSetObjectPhotoPath(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
-		object := &domain.Object{
+		objRepo := or.NewObjectRepositoryMock()
+		custOptObjRepo := cr.NewObjectCustomOptionRepositoryMock()
+		generator := g.NewMockGenerator()
+		uc := NewObjectUsecase(objRepo, custOptObjRepo, generator)
+
+		object := domain.Object{
 			Id:           "231934sadas9123deqw",
 			Name:         "BMW X5",
 			Rating:       8,
@@ -343,7 +380,7 @@ func TestSetObjectPhotoPath(t *testing.T) {
 			Advs:         "Good SUV",
 			Disadvs:      "Hard to find some details",
 			ComparisonId: "85434230werhuhi123912304",
-			ObjectCustomOptions: []*domain.ObjectCustomOption{
+			ObjectCustomOptions: []domain.ObjectCustomOption{
 				{
 					ObjectId:       "231934sadas9123deqw",
 					CustomOptionId: "432230ewrew3424rwe",
@@ -351,16 +388,17 @@ func TestSetObjectPhotoPath(t *testing.T) {
 				},
 			},
 		}
+
 		id := "92133easd123srewr132"
 		path := "/photos/4324123sfnjsadn1239213.jpg"
 
-		objRepo := or.NewObjectRepositoryMock()
-		custOptObjRepo := cr.NewObjectCustomOptionRepositoryMock()
-		uc := NewObjectUsecase(objRepo, custOptObjRepo)
+		changedObject := object
+		changedObject.PhotoPath = path
+
 		ctx := context.Background()
 
 		objRepo.On("GetObjectById", ctx, id).Return(object, nil)
-		objRepo.On("UpdateObject", ctx, object).Return(nil)
+		objRepo.On("UpdateObject", ctx, changedObject).Return(nil)
 
 		err := uc.SetObjectPhotoPath(ctx, id, path)
 
@@ -369,15 +407,17 @@ func TestSetObjectPhotoPath(t *testing.T) {
 	})
 
 	t.Run("Error", func(t *testing.T) {
+		objRepo := or.NewObjectRepositoryMock()
+		custOptObjRepo := cr.NewObjectCustomOptionRepositoryMock()
+		generator := g.NewMockGenerator()
+		uc := NewObjectUsecase(objRepo, custOptObjRepo, generator)
+
 		id := "231934sadas9123deqw"
 		path := "/photos/4324123sfnjsadn1239213.jpg"
 
-		objRepo := or.NewObjectRepositoryMock()
-		custOptObjRepo := cr.NewObjectCustomOptionRepositoryMock()
-		uc := NewObjectUsecase(objRepo, custOptObjRepo)
 		ctx := context.Background()
 
-		objRepo.On("GetObjectById", ctx, id).Return(nil, errors.New("some error"))
+		objRepo.On("GetObjectById", ctx, id).Return(nil, assert.AnError)
 
 		err := uc.SetObjectPhotoPath(ctx, id, path)
 

@@ -28,15 +28,15 @@ type objectCustomOptionMongo struct {
 func (repo *objectCustomOptionRepositoryMongo) GetObjectCustomOptionsByObjectId(
 	ctx context.Context,
 	objectId string,
-) ([]*domain.ObjectCustomOption, error) {
+) ([]domain.ObjectCustomOption, error) {
 	cur, err := repo.objectCustomOptionsColl.Find(ctx, bson.M{"object_id": objectId})
 	if err != nil {
 		return nil, fmt.Errorf("fetch object custom options from mongo error: %w", err)
 	}
 
-	objCustomOptions := make([]*domain.ObjectCustomOption, 0)
+	objCustomOptions := make([]domain.ObjectCustomOption, 0)
 	for cur.Next(ctx) {
-		ocom := new(objectCustomOptionMongo)
+		var ocom objectCustomOptionMongo
 		if err := cur.Decode(ocom); err != nil {
 			return nil, fmt.Errorf("decode mongo result error %w", err)
 		}
@@ -49,7 +49,7 @@ func (repo *objectCustomOptionRepositoryMongo) GetObjectCustomOptionsByObjectId(
 
 func (repo *objectCustomOptionRepositoryMongo) AddObjectCustomOption(
 	ctx context.Context,
-	objectCustomOption *domain.ObjectCustomOption,
+	objectCustomOption domain.ObjectCustomOption,
 ) error {
 	_, err := repo.objectCustomOptionsColl.InsertOne(
 		ctx,
@@ -72,7 +72,7 @@ func (repo *objectCustomOptionRepositoryMongo) AddObjectCustomOption(
 
 func (repo *objectCustomOptionRepositoryMongo) UpdateObjectCustomOption(
 	ctx context.Context,
-	objectCustomOption *domain.ObjectCustomOption,
+	objectCustomOption domain.ObjectCustomOption,
 ) error {
 	res, err := repo.objectCustomOptionsColl.UpdateOne(
 		ctx,
@@ -93,16 +93,16 @@ func (repo *objectCustomOptionRepositoryMongo) UpdateObjectCustomOption(
 	return nil
 }
 
-func toDomainObjectCustomOption(ocom *objectCustomOptionMongo) *domain.ObjectCustomOption {
-	return &domain.ObjectCustomOption{
+func toDomainObjectCustomOption(ocom objectCustomOptionMongo) domain.ObjectCustomOption {
+	return domain.ObjectCustomOption{
 		ObjectId:       ocom.ObjectId,
 		CustomOptionId: ocom.CustomOptionId,
 		Value:          ocom.Value,
 	}
 }
 
-func toObjectCustomOptionMongo(objectCustomOption *domain.ObjectCustomOption) *objectCustomOptionMongo {
-	return &objectCustomOptionMongo{
+func toObjectCustomOptionMongo(objectCustomOption domain.ObjectCustomOption) objectCustomOptionMongo {
+	return objectCustomOptionMongo{
 		ObjectId:       objectCustomOption.ObjectId,
 		CustomOptionId: objectCustomOption.CustomOptionId,
 		Value:          objectCustomOption.Value,

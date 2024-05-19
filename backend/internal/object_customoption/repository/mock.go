@@ -18,15 +18,15 @@ func NewObjectCustomOptionRepositoryMock() *objectCustomOptionRepositoryMock {
 func (repo *objectCustomOptionRepositoryMock) GetObjectCustomOptionsByObjectId(
 	ctx context.Context,
 	objectId string,
-) ([]*domain.ObjectCustomOption, error) {
+) ([]domain.ObjectCustomOption, error) {
 	args := repo.Called(ctx, objectId)
 
 	ret, err := args.Get(0), args.Error(1)
 
-	var objectCustomOptions []*domain.ObjectCustomOption
+	var objectCustomOptions []domain.ObjectCustomOption
 
 	if ret != nil {
-		objectCustomOptions = ret.([]*domain.ObjectCustomOption)
+		objectCustomOptions = ret.([]domain.ObjectCustomOption)
 	}
 
 	return objectCustomOptions, err
@@ -34,7 +34,7 @@ func (repo *objectCustomOptionRepositoryMock) GetObjectCustomOptionsByObjectId(
 
 func (repo *objectCustomOptionRepositoryMock) AddObjectCustomOption(
 	ctx context.Context,
-	objectCustomOption *domain.ObjectCustomOption,
+	objectCustomOption domain.ObjectCustomOption,
 ) error {
 	args := repo.Called(ctx, objectCustomOption)
 
@@ -43,7 +43,7 @@ func (repo *objectCustomOptionRepositoryMock) AddObjectCustomOption(
 
 func (repo *objectCustomOptionRepositoryMock) UpdateObjectCustomOption(
 	ctx context.Context,
-	objectCustomOption *domain.ObjectCustomOption,
+	objectCustomOption domain.ObjectCustomOption,
 ) error {
 	args := repo.Called(ctx, objectCustomOption)
 

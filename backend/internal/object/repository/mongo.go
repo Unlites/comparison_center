@@ -35,8 +35,8 @@ type objectMongo struct {
 
 func (repo *objectRepositoryMongo) GetObjects(
 	ctx context.Context,
-	filter *domain.ObjectFilter,
-) ([]*domain.Object, error) {
+	filter domain.ObjectFilter,
+) ([]domain.Object, error) {
 	opts := options.Find().
 		SetSort(bson.M{filter.OrderBy: 1}).
 		SetSkip(int64(filter.Offset)).
@@ -60,9 +60,9 @@ func (repo *objectRepositoryMongo) GetObjects(
 		return nil, fmt.Errorf("fetch objects from mongo error: %w", err)
 	}
 
-	objects := make([]*domain.Object, 0, filter.Limit)
+	objects := make([]domain.Object, 0, filter.Limit)
 	for cur.Next(ctx) {
-		obj := new(objectMongo)
+		var obj objectMongo
 		if err := cur.Decode(obj); err != nil {
 			return nil, fmt.Errorf("decode mongo result error %w", err)
 		}
@@ -76,19 +76,19 @@ func (repo *objectRepositoryMongo) GetObjects(
 func (repo *objectRepositoryMongo) GetObjectById(
 	ctx context.Context,
 	id string,
-) (*domain.Object, error) {
+) (domain.Object, error) {
 	res := repo.objectsColl.FindOne(ctx, bson.M{"_id": id})
 	if res.Err() != nil {
 		if errors.Is(res.Err(), mongo.ErrNoDocuments) {
-			return nil, fmt.Errorf("object %w", domain.ErrNotFound)
+			return domain.Object{}, fmt.Errorf("object %w", domain.ErrNotFound)
 		}
 
-		return nil, fmt.Errorf("get object from mongo error %w", res.Err())
+		return domain.Object{}, fmt.Errorf("get object from mongo error %w", res.Err())
 	}
 
-	obj := new(objectMongo)
+	var obj objectMongo
 	if err := res.Decode(obj); err != nil {
-		return nil, fmt.Errorf("decode mongo result error %w", err)
+		return domain.Object{}, fmt.Errorf("decode mongo result error %w", err)
 	}
 
 	return toDomainObject(obj), nil
@@ -96,7 +96,7 @@ func (repo *objectRepositoryMongo) GetObjectById(
 
 func (repo *objectRepositoryMongo) CreateObject(
 	ctx context.Context,
-	object *domain.Object,
+	object domain.Object,
 ) error {
 	_, err := repo.objectsColl.InsertOne(ctx, toObjectMongo(object))
 	if err != nil {
@@ -108,7 +108,7 @@ func (repo *objectRepositoryMongo) CreateObject(
 
 func (repo *objectRepositoryMongo) UpdateObject(
 	ctx context.Context,
-	object *domain.Object,
+	object domain.Object,
 ) error {
 	res, err := repo.objectsColl.UpdateOne(
 		ctx,
@@ -142,8 +142,8 @@ func (repo *objectRepositoryMongo) DeleteObject(
 	return nil
 }
 
-func toDomainObject(objMongo *objectMongo) *domain.Object {
-	return &domain.Object{
+func toDomainObject(objMongo objectMongo) domain.Object {
+	return domain.Object{
 		Id:           objMongo.Id,
 		Name:         objMongo.Name,
 		Rating:       objMongo.Rating,
@@ -155,8 +155,8 @@ func toDomainObject(objMongo *objectMongo) *domain.Object {
 	}
 }
 
-func toObjectMongo(obj *domain.Object) *objectMongo {
-	return &objectMongo{
+func toObjectMongo(obj domain.Object) objectMongo {
+	return objectMongo{
 		Id:           obj.Id,
 		Name:         obj.Name,
 		Rating:       obj.Rating,

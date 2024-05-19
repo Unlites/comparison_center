@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"slices"
 	"testing"
 	"time"
 
@@ -9,6 +10,7 @@ import (
 	"github.com/Unlites/comparison_center/backend/internal/domain"
 	g "github.com/Unlites/comparison_center/backend/pkg/generator"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 func TestGetComparisons(t *testing.T) {
@@ -119,20 +121,20 @@ func TestCreateComparison(t *testing.T) {
 
 		inputComparison := domain.Comparison{
 			Name:            "Cars",
-			CustomOptionIds: []string{"3332415fdsfsd31231", "5412asdsa131231`"},
-		}
-
-		changedComparison := domain.Comparison{
-			Id:              "49234991asdsanjd12305",
-			Name:            inputComparison.Name,
-			CustomOptionIds: inputComparison.CustomOptionIds,
-			CreatedAt:       time.Now(),
+			CustomOptionIds: []string{"3332415fdsfsd31231", "5412asdsa131231"},
 		}
 
 		ctx := context.Background()
 
 		generator.On("GenerateId").Return("49234991asdsanjd12305")
-		repo.On("CreateComparison", ctx, changedComparison).Return(nil)
+		repo.On("CreateComparison", ctx, mock.MatchedBy(func(comparison domain.Comparison) bool {
+			return comparison.Id == "49234991asdsanjd12305" &&
+				comparison.Name == "Cars" &&
+				slices.Equal(
+					comparison.CustomOptionIds,
+					[]string{"3332415fdsfsd31231", "5412asdsa131231"},
+				)
+		})).Return(nil)
 
 		err := uc.CreateComparison(ctx, inputComparison)
 
@@ -150,17 +152,17 @@ func TestCreateComparison(t *testing.T) {
 			CustomOptionIds: []string{"432432sadas5433da", "349fsda32bfsd21d"},
 		}
 
-		changedComparison := domain.Comparison{
-			Id:              "32939fsdfsdf912312",
-			Name:            inputComparison.Name,
-			CustomOptionIds: inputComparison.CustomOptionIds,
-			CreatedAt:       time.Now(),
-		}
-
 		ctx := context.Background()
 
 		generator.On("GenerateId").Return("32939fsdfsdf912312")
-		repo.On("CreateComparison", ctx, changedComparison).Return(assert.AnError)
+		repo.On("CreateComparison", ctx, mock.MatchedBy(func(comparison domain.Comparison) bool {
+			return comparison.Id == "32939fsdfsdf912312" &&
+				comparison.Name == "Cars" &&
+				slices.Equal(
+					comparison.CustomOptionIds,
+					[]string{"432432sadas5433da", "349fsda32bfsd21d"},
+				)
+		})).Return(assert.AnError)
 
 		err := uc.CreateComparison(ctx, inputComparison)
 

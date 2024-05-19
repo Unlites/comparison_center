@@ -49,7 +49,7 @@ func NewApp(ctx context.Context, log *slog.Logger, cfg *config.Config) (*App, er
 
 	objectRepository := or.NewObjectRepositoryMongo(client)
 	objectCustomOptionRepository := ocor.NewObjectCustomOptionRepositoryMongo(client)
-	objectUsecase := ou.NewObjectUsecase(objectRepository, objectCustomOptionRepository)
+	objectUsecase := ou.NewObjectUsecase(objectRepository, objectCustomOptionRepository, generator)
 	objectHandler := oh.NewObjectHandler(objectUsecase, cfg.PhotosDir, cfg.MaxUploadSizeMB)
 
 	router := r.NewDefaultRouter()
