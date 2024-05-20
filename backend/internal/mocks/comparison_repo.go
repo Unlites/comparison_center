@@ -1,4 +1,4 @@
-package repository
+package mocks
 
 import (
 	"context"
@@ -7,15 +7,15 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-type comparisonRepositoryMock struct {
+type ComparisonRepositoryMock struct {
 	mock.Mock
 }
 
-func NewComparisonRepositoryMock() *comparisonRepositoryMock {
-	return &comparisonRepositoryMock{}
+func NewComparisonRepositoryMock() *ComparisonRepositoryMock {
+	return &ComparisonRepositoryMock{}
 }
 
-func (repo *comparisonRepositoryMock) GetComparisons(
+func (repo *ComparisonRepositoryMock) GetComparisons(
 	ctx context.Context,
 	filter domain.ComparisonFilter,
 ) ([]domain.Comparison, error) {
@@ -32,7 +32,7 @@ func (repo *comparisonRepositoryMock) GetComparisons(
 	return comparisons, err
 }
 
-func (repo *comparisonRepositoryMock) GetComparisonById(
+func (repo *ComparisonRepositoryMock) GetComparisonById(
 	ctx context.Context,
 	id string,
 ) (domain.Comparison, error) {
@@ -49,7 +49,7 @@ func (repo *comparisonRepositoryMock) GetComparisonById(
 	return comparison, err
 }
 
-func (repo *comparisonRepositoryMock) UpdateComparison(
+func (repo *ComparisonRepositoryMock) UpdateComparison(
 	ctx context.Context,
 	comparison domain.Comparison,
 ) error {
@@ -58,7 +58,7 @@ func (repo *comparisonRepositoryMock) UpdateComparison(
 	return args.Error(0)
 }
 
-func (repo *comparisonRepositoryMock) CreateComparison(
+func (repo *ComparisonRepositoryMock) CreateComparison(
 	ctx context.Context,
 	comparison domain.Comparison,
 ) error {
@@ -67,7 +67,7 @@ func (repo *comparisonRepositoryMock) CreateComparison(
 	return args.Error(0)
 }
 
-func (repo *comparisonRepositoryMock) DeleteComparison(
+func (repo *ComparisonRepositoryMock) DeleteComparison(
 	ctx context.Context,
 	id string,
 ) error {

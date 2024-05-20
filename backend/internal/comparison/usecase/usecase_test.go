@@ -6,17 +6,16 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Unlites/comparison_center/backend/internal/comparison/repository"
 	"github.com/Unlites/comparison_center/backend/internal/domain"
-	g "github.com/Unlites/comparison_center/backend/pkg/generator"
+	"github.com/Unlites/comparison_center/backend/internal/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
 
 func TestGetComparisons(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
-		repo := repository.NewComparisonRepositoryMock()
-		generator := g.NewMockGenerator()
+		repo := mocks.NewComparisonRepositoryMock()
+		generator := mocks.NewMockGenerator()
 		uc := NewComparisonUsecase(repo, generator)
 
 		ctx := context.Background()
@@ -50,8 +49,8 @@ func TestGetComparisons(t *testing.T) {
 	})
 
 	t.Run("Error", func(t *testing.T) {
-		repo := repository.NewComparisonRepositoryMock()
-		generator := g.NewMockGenerator()
+		repo := mocks.NewComparisonRepositoryMock()
+		generator := mocks.NewMockGenerator()
 		uc := NewComparisonUsecase(repo, generator)
 
 		ctx := context.Background()
@@ -72,8 +71,8 @@ func TestGetComparisons(t *testing.T) {
 
 func TestGetComparisonById(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
-		repo := repository.NewComparisonRepositoryMock()
-		generator := g.NewMockGenerator()
+		repo := mocks.NewComparisonRepositoryMock()
+		generator := mocks.NewMockGenerator()
 		uc := NewComparisonUsecase(repo, generator)
 
 		returnedComparison := domain.Comparison{
@@ -96,8 +95,8 @@ func TestGetComparisonById(t *testing.T) {
 	})
 
 	t.Run("Error", func(t *testing.T) {
-		repo := repository.NewComparisonRepositoryMock()
-		generator := g.NewMockGenerator()
+		repo := mocks.NewComparisonRepositoryMock()
+		generator := mocks.NewMockGenerator()
 		uc := NewComparisonUsecase(repo, generator)
 
 		ctx := context.Background()
@@ -115,8 +114,8 @@ func TestGetComparisonById(t *testing.T) {
 
 func TestCreateComparison(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
-		repo := repository.NewComparisonRepositoryMock()
-		generator := g.NewMockGenerator()
+		repo := mocks.NewComparisonRepositoryMock()
+		generator := mocks.NewMockGenerator()
 		uc := NewComparisonUsecase(repo, generator)
 
 		inputComparison := domain.Comparison{
@@ -143,8 +142,8 @@ func TestCreateComparison(t *testing.T) {
 	})
 
 	t.Run("Error", func(t *testing.T) {
-		repo := repository.NewComparisonRepositoryMock()
-		generator := g.NewMockGenerator()
+		repo := mocks.NewComparisonRepositoryMock()
+		generator := mocks.NewMockGenerator()
 		uc := NewComparisonUsecase(repo, generator)
 
 		inputComparison := domain.Comparison{
@@ -173,8 +172,8 @@ func TestCreateComparison(t *testing.T) {
 
 func TestUpdateComparison(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
-		repo := repository.NewComparisonRepositoryMock()
-		generator := g.NewMockGenerator()
+		repo := mocks.NewComparisonRepositoryMock()
+		generator := mocks.NewMockGenerator()
 		uc := NewComparisonUsecase(repo, generator)
 
 		ctx := context.Background()
@@ -210,8 +209,8 @@ func TestUpdateComparison(t *testing.T) {
 	})
 
 	t.Run("Error", func(t *testing.T) {
-		repo := repository.NewComparisonRepositoryMock()
-		generator := g.NewMockGenerator()
+		repo := mocks.NewComparisonRepositoryMock()
+		generator := mocks.NewMockGenerator()
 		uc := NewComparisonUsecase(repo, generator)
 
 		ctx := context.Background()
@@ -249,8 +248,8 @@ func TestUpdateComparison(t *testing.T) {
 
 func TestDeleteComparison(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
-		repo := repository.NewComparisonRepositoryMock()
-		generator := g.NewMockGenerator()
+		repo := mocks.NewComparisonRepositoryMock()
+		generator := mocks.NewMockGenerator()
 		uc := NewComparisonUsecase(repo, generator)
 
 		ctx := context.Background()
@@ -265,8 +264,8 @@ func TestDeleteComparison(t *testing.T) {
 	})
 
 	t.Run("Error", func(t *testing.T) {
-		repo := repository.NewComparisonRepositoryMock()
-		generator := g.NewMockGenerator()
+		repo := mocks.NewComparisonRepositoryMock()
+		generator := mocks.NewMockGenerator()
 		uc := NewComparisonUsecase(repo, generator)
 
 		ctx := context.Background()

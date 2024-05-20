@@ -4,16 +4,15 @@ import (
 	"context"
 	"testing"
 
-	"github.com/Unlites/comparison_center/backend/internal/customoption/repository"
 	"github.com/Unlites/comparison_center/backend/internal/domain"
-	g "github.com/Unlites/comparison_center/backend/pkg/generator"
+	"github.com/Unlites/comparison_center/backend/internal/mocks"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestGetCustomOptions(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
-		repo := repository.NewCustomOptionRepositoryMock()
-		generator := g.NewMockGenerator()
+		repo := mocks.NewCustomOptionRepositoryMock()
+		generator := mocks.NewMockGenerator()
 		uc := NewCustomOptionUsecase(repo, generator)
 
 		ctx := context.Background()
@@ -44,8 +43,8 @@ func TestGetCustomOptions(t *testing.T) {
 	})
 
 	t.Run("Error", func(t *testing.T) {
-		repo := repository.NewCustomOptionRepositoryMock()
-		generator := g.NewMockGenerator()
+		repo := mocks.NewCustomOptionRepositoryMock()
+		generator := mocks.NewMockGenerator()
 		uc := NewCustomOptionUsecase(repo, generator)
 
 		ctx := context.Background()
@@ -68,8 +67,8 @@ func TestGetCustomOptions(t *testing.T) {
 
 func TestCreateCustomOption(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
-		repo := repository.NewCustomOptionRepositoryMock()
-		generator := g.NewMockGenerator()
+		repo := mocks.NewCustomOptionRepositoryMock()
+		generator := mocks.NewMockGenerator()
 		uc := NewCustomOptionUsecase(repo, generator)
 
 		ctx := context.Background()
@@ -88,8 +87,8 @@ func TestCreateCustomOption(t *testing.T) {
 	})
 
 	t.Run("Error", func(t *testing.T) {
-		repo := repository.NewCustomOptionRepositoryMock()
-		generator := g.NewMockGenerator()
+		repo := mocks.NewCustomOptionRepositoryMock()
+		generator := mocks.NewMockGenerator()
 		uc := NewCustomOptionUsecase(repo, generator)
 
 		ctx := context.Background()
@@ -110,8 +109,8 @@ func TestCreateCustomOption(t *testing.T) {
 
 func TestDeleteCustomOption(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
-		repo := repository.NewCustomOptionRepositoryMock()
-		generator := g.NewMockGenerator()
+		repo := mocks.NewCustomOptionRepositoryMock()
+		generator := mocks.NewMockGenerator()
 		uc := NewCustomOptionUsecase(repo, generator)
 
 		ctx := context.Background()
@@ -128,8 +127,8 @@ func TestDeleteCustomOption(t *testing.T) {
 	})
 
 	t.Run("Error", func(t *testing.T) {
-		repo := repository.NewCustomOptionRepositoryMock()
-		generator := g.NewMockGenerator()
+		repo := mocks.NewCustomOptionRepositoryMock()
+		generator := mocks.NewMockGenerator()
 		uc := NewCustomOptionUsecase(repo, generator)
 
 		ctx := context.Background()
@@ -146,8 +145,8 @@ func TestDeleteCustomOption(t *testing.T) {
 
 func TestGetCustomOptionById(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
-		repo := repository.NewCustomOptionRepositoryMock()
-		generator := g.NewMockGenerator()
+		repo := mocks.NewCustomOptionRepositoryMock()
+		generator := mocks.NewMockGenerator()
 		uc := NewCustomOptionUsecase(repo, generator)
 
 		ctx := context.Background()
@@ -170,8 +169,8 @@ func TestGetCustomOptionById(t *testing.T) {
 	})
 
 	t.Run("Error", func(t *testing.T) {
-		repo := repository.NewCustomOptionRepositoryMock()
-		generator := g.NewMockGenerator()
+		repo := mocks.NewCustomOptionRepositoryMock()
+		generator := mocks.NewMockGenerator()
 		uc := NewCustomOptionUsecase(repo, generator)
 
 		ctx := context.Background()

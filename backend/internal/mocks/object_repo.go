@@ -1,4 +1,4 @@
-package repository
+package mocks
 
 import (
 	"context"
@@ -7,15 +7,15 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-type objectRepositoryMock struct {
+type ObjectRepositoryMock struct {
 	mock.Mock
 }
 
-func NewObjectRepositoryMock() *objectRepositoryMock {
-	return &objectRepositoryMock{}
+func NewObjectRepositoryMock() *ObjectRepositoryMock {
+	return &ObjectRepositoryMock{}
 }
 
-func (repo *objectRepositoryMock) GetObjects(
+func (repo *ObjectRepositoryMock) GetObjects(
 	ctx context.Context,
 	filter domain.ObjectFilter,
 ) ([]domain.Object, error) {
@@ -32,7 +32,7 @@ func (repo *objectRepositoryMock) GetObjects(
 	return objects, err
 }
 
-func (repo *objectRepositoryMock) GetObjectById(ctx context.Context, id string) (domain.Object, error) {
+func (repo *ObjectRepositoryMock) GetObjectById(ctx context.Context, id string) (domain.Object, error) {
 	args := repo.Called(ctx, id)
 
 	ret, err := args.Get(0), args.Error(1)
@@ -46,19 +46,19 @@ func (repo *objectRepositoryMock) GetObjectById(ctx context.Context, id string) 
 	return object, err
 }
 
-func (repo *objectRepositoryMock) UpdateObject(ctx context.Context, object domain.Object) error {
+func (repo *ObjectRepositoryMock) UpdateObject(ctx context.Context, object domain.Object) error {
 	args := repo.Called(ctx, object)
 
 	return args.Error(0)
 }
 
-func (repo *objectRepositoryMock) CreateObject(ctx context.Context, object domain.Object) error {
+func (repo *ObjectRepositoryMock) CreateObject(ctx context.Context, object domain.Object) error {
 	args := repo.Called(ctx, object)
 
 	return args.Error(0)
 }
 
-func (repo *objectRepositoryMock) DeleteObject(ctx context.Context, id string) error {
+func (repo *ObjectRepositoryMock) DeleteObject(ctx context.Context, id string) error {
 	args := repo.Called(ctx, id)
 
 	return args.Error(0)

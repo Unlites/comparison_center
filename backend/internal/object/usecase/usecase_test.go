@@ -6,18 +6,16 @@ import (
 	"time"
 
 	"github.com/Unlites/comparison_center/backend/internal/domain"
-	or "github.com/Unlites/comparison_center/backend/internal/object/repository"
-	cr "github.com/Unlites/comparison_center/backend/internal/object_customoption/repository"
-	g "github.com/Unlites/comparison_center/backend/pkg/generator"
+	"github.com/Unlites/comparison_center/backend/internal/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
 
 func TestGetObjects(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
-		objRepo := or.NewObjectRepositoryMock()
-		custOptObjRepo := cr.NewObjectCustomOptionRepositoryMock()
-		generator := g.NewMockGenerator()
+		objRepo := mocks.NewObjectRepositoryMock()
+		custOptObjRepo := mocks.NewObjectCustomOptionRepositoryMock()
+		generator := mocks.NewMockGenerator()
 		uc := NewObjectUsecase(objRepo, custOptObjRepo, generator)
 		returnedObjects := []domain.Object{
 			{
@@ -65,9 +63,9 @@ func TestGetObjects(t *testing.T) {
 	})
 
 	t.Run("Error", func(t *testing.T) {
-		objRepo := or.NewObjectRepositoryMock()
-		custOptObjRepo := cr.NewObjectCustomOptionRepositoryMock()
-		generator := g.NewMockGenerator()
+		objRepo := mocks.NewObjectRepositoryMock()
+		custOptObjRepo := mocks.NewObjectCustomOptionRepositoryMock()
+		generator := mocks.NewMockGenerator()
 		uc := NewObjectUsecase(objRepo, custOptObjRepo, generator)
 
 		ctx := context.Background()
@@ -88,9 +86,9 @@ func TestGetObjects(t *testing.T) {
 
 func TestGetObjectById(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
-		objRepo := or.NewObjectRepositoryMock()
-		custOptObjRepo := cr.NewObjectCustomOptionRepositoryMock()
-		generator := g.NewMockGenerator()
+		objRepo := mocks.NewObjectRepositoryMock()
+		custOptObjRepo := mocks.NewObjectCustomOptionRepositoryMock()
+		generator := mocks.NewMockGenerator()
 		uc := NewObjectUsecase(objRepo, custOptObjRepo, generator)
 
 		returnedObject := domain.Object{
@@ -136,9 +134,9 @@ func TestGetObjectById(t *testing.T) {
 	})
 
 	t.Run("Error", func(t *testing.T) {
-		objRepo := or.NewObjectRepositoryMock()
-		custOptObjRepo := cr.NewObjectCustomOptionRepositoryMock()
-		generator := g.NewMockGenerator()
+		objRepo := mocks.NewObjectRepositoryMock()
+		custOptObjRepo := mocks.NewObjectCustomOptionRepositoryMock()
+		generator := mocks.NewMockGenerator()
 		uc := NewObjectUsecase(objRepo, custOptObjRepo, generator)
 
 		ctx := context.Background()
@@ -157,9 +155,9 @@ func TestGetObjectById(t *testing.T) {
 
 func TestCreateObject(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
-		objRepo := or.NewObjectRepositoryMock()
-		custOptObjRepo := cr.NewObjectCustomOptionRepositoryMock()
-		generator := g.NewMockGenerator()
+		objRepo := mocks.NewObjectRepositoryMock()
+		custOptObjRepo := mocks.NewObjectCustomOptionRepositoryMock()
+		generator := mocks.NewMockGenerator()
 		uc := NewObjectUsecase(objRepo, custOptObjRepo, generator)
 
 		inputObject := domain.Object{
@@ -192,9 +190,9 @@ func TestCreateObject(t *testing.T) {
 	})
 
 	t.Run("Error", func(t *testing.T) {
-		objRepo := or.NewObjectRepositoryMock()
-		custOptObjRepo := cr.NewObjectCustomOptionRepositoryMock()
-		generator := g.NewMockGenerator()
+		objRepo := mocks.NewObjectRepositoryMock()
+		custOptObjRepo := mocks.NewObjectCustomOptionRepositoryMock()
+		generator := mocks.NewMockGenerator()
 		uc := NewObjectUsecase(objRepo, custOptObjRepo, generator)
 
 		inputObject := domain.Object{
@@ -229,9 +227,9 @@ func TestCreateObject(t *testing.T) {
 
 func TestUpdateObject(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
-		objRepo := or.NewObjectRepositoryMock()
-		custOptObjRepo := cr.NewObjectCustomOptionRepositoryMock()
-		generator := g.NewMockGenerator()
+		objRepo := mocks.NewObjectRepositoryMock()
+		custOptObjRepo := mocks.NewObjectCustomOptionRepositoryMock()
+		generator := mocks.NewMockGenerator()
 		uc := NewObjectUsecase(objRepo, custOptObjRepo, generator)
 
 		returnedOnGetObject := domain.Object{
@@ -292,9 +290,9 @@ func TestUpdateObject(t *testing.T) {
 	})
 
 	t.Run("Error", func(t *testing.T) {
-		objRepo := or.NewObjectRepositoryMock()
-		custOptObjRepo := cr.NewObjectCustomOptionRepositoryMock()
-		generator := g.NewMockGenerator()
+		objRepo := mocks.NewObjectRepositoryMock()
+		custOptObjRepo := mocks.NewObjectCustomOptionRepositoryMock()
+		generator := mocks.NewMockGenerator()
 		uc := NewObjectUsecase(objRepo, custOptObjRepo, generator)
 
 		inputObject := domain.Object{
@@ -331,9 +329,9 @@ func TestUpdateObject(t *testing.T) {
 
 func TestDeleteObject(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
-		objRepo := or.NewObjectRepositoryMock()
-		custOptObjRepo := cr.NewObjectCustomOptionRepositoryMock()
-		generator := g.NewMockGenerator()
+		objRepo := mocks.NewObjectRepositoryMock()
+		custOptObjRepo := mocks.NewObjectCustomOptionRepositoryMock()
+		generator := mocks.NewMockGenerator()
 		uc := NewObjectUsecase(objRepo, custOptObjRepo, generator)
 
 		ctx := context.Background()
@@ -348,9 +346,9 @@ func TestDeleteObject(t *testing.T) {
 	})
 
 	t.Run("Error", func(t *testing.T) {
-		objRepo := or.NewObjectRepositoryMock()
-		custOptObjRepo := cr.NewObjectCustomOptionRepositoryMock()
-		generator := g.NewMockGenerator()
+		objRepo := mocks.NewObjectRepositoryMock()
+		custOptObjRepo := mocks.NewObjectCustomOptionRepositoryMock()
+		generator := mocks.NewMockGenerator()
 		uc := NewObjectUsecase(objRepo, custOptObjRepo, generator)
 
 		ctx := context.Background()
@@ -367,9 +365,9 @@ func TestDeleteObject(t *testing.T) {
 
 func TestSetObjectPhotoPath(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
-		objRepo := or.NewObjectRepositoryMock()
-		custOptObjRepo := cr.NewObjectCustomOptionRepositoryMock()
-		generator := g.NewMockGenerator()
+		objRepo := mocks.NewObjectRepositoryMock()
+		custOptObjRepo := mocks.NewObjectCustomOptionRepositoryMock()
+		generator := mocks.NewMockGenerator()
 		uc := NewObjectUsecase(objRepo, custOptObjRepo, generator)
 
 		object := domain.Object{
@@ -407,9 +405,9 @@ func TestSetObjectPhotoPath(t *testing.T) {
 	})
 
 	t.Run("Error", func(t *testing.T) {
-		objRepo := or.NewObjectRepositoryMock()
-		custOptObjRepo := cr.NewObjectCustomOptionRepositoryMock()
-		generator := g.NewMockGenerator()
+		objRepo := mocks.NewObjectRepositoryMock()
+		custOptObjRepo := mocks.NewObjectCustomOptionRepositoryMock()
+		generator := mocks.NewMockGenerator()
 		uc := NewObjectUsecase(objRepo, custOptObjRepo, generator)
 
 		id := "231934sadas9123deqw"

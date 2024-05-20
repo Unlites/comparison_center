@@ -1,4 +1,4 @@
-package repository
+package mocks
 
 import (
 	"context"
@@ -7,15 +7,15 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-type customOptionRepositoryMock struct {
+type CustomOptionRepositoryMock struct {
 	mock.Mock
 }
 
-func NewCustomOptionRepositoryMock() *customOptionRepositoryMock {
-	return &customOptionRepositoryMock{}
+func NewCustomOptionRepositoryMock() *CustomOptionRepositoryMock {
+	return &CustomOptionRepositoryMock{}
 }
 
-func (repo *customOptionRepositoryMock) GetCustomOptions(
+func (repo *CustomOptionRepositoryMock) GetCustomOptions(
 	ctx context.Context,
 	filter domain.CustomOptionFilter,
 ) ([]domain.CustomOption, error) {
@@ -32,7 +32,7 @@ func (repo *customOptionRepositoryMock) GetCustomOptions(
 	return customOptions, err
 }
 
-func (repo *customOptionRepositoryMock) GetCustomOptionById(
+func (repo *CustomOptionRepositoryMock) GetCustomOptionById(
 	ctx context.Context,
 	id string,
 ) (domain.CustomOption, error) {
@@ -49,7 +49,7 @@ func (repo *customOptionRepositoryMock) GetCustomOptionById(
 	return customOption, err
 }
 
-func (repo *customOptionRepositoryMock) UpdateCustomOption(
+func (repo *CustomOptionRepositoryMock) UpdateCustomOption(
 	ctx context.Context,
 	customOption domain.CustomOption,
 ) error {
@@ -58,7 +58,7 @@ func (repo *customOptionRepositoryMock) UpdateCustomOption(
 	return args.Error(0)
 }
 
-func (repo *customOptionRepositoryMock) CreateCustomOption(
+func (repo *CustomOptionRepositoryMock) CreateCustomOption(
 	ctx context.Context,
 	customOption domain.CustomOption,
 ) error {
@@ -67,7 +67,7 @@ func (repo *customOptionRepositoryMock) CreateCustomOption(
 	return args.Error(0)
 }
 
-func (repo *customOptionRepositoryMock) DeleteCustomOption(
+func (repo *CustomOptionRepositoryMock) DeleteCustomOption(
 	ctx context.Context,
 	id string,
 ) error {
