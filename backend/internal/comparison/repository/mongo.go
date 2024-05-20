@@ -12,7 +12,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-type comparisonRepositoryMongo struct {
+type ComparisonRepositoryMongo struct {
 	comparisonsColl *mongo.Collection
 }
 
@@ -23,13 +23,13 @@ type comparisonMongo struct {
 	CustomOptionIds []string  `bson:"custom_option_ids"`
 }
 
-func NewComparisonRepositoryMongo(client *mongo.Client) *comparisonRepositoryMongo {
-	return &comparisonRepositoryMongo{
+func NewComparisonRepositoryMongo(client *mongo.Client) *ComparisonRepositoryMongo {
+	return &ComparisonRepositoryMongo{
 		comparisonsColl: client.Database("database").Collection("comparisons"),
 	}
 }
 
-func (repo *comparisonRepositoryMongo) GetComparisons(
+func (repo *ComparisonRepositoryMongo) GetComparisons(
 	ctx context.Context,
 	filter domain.ComparisonFilter,
 ) ([]domain.Comparison, error) {
@@ -56,7 +56,7 @@ func (repo *comparisonRepositoryMongo) GetComparisons(
 	return comparisons, nil
 }
 
-func (repo *comparisonRepositoryMongo) GetComparisonById(
+func (repo *ComparisonRepositoryMongo) GetComparisonById(
 	ctx context.Context,
 	id string,
 ) (domain.Comparison, error) {
@@ -77,7 +77,7 @@ func (repo *comparisonRepositoryMongo) GetComparisonById(
 	return toDomainComparison(cm), nil
 }
 
-func (repo *comparisonRepositoryMongo) UpdateComparison(
+func (repo *ComparisonRepositoryMongo) UpdateComparison(
 	ctx context.Context,
 	comparison domain.Comparison,
 ) error {
@@ -105,7 +105,7 @@ func (repo *comparisonRepositoryMongo) UpdateComparison(
 	return nil
 }
 
-func (repo *comparisonRepositoryMongo) CreateComparison(
+func (repo *ComparisonRepositoryMongo) CreateComparison(
 	ctx context.Context,
 	comparison domain.Comparison,
 ) error {
@@ -125,7 +125,7 @@ func (repo *comparisonRepositoryMongo) CreateComparison(
 	return nil
 }
 
-func (repo *comparisonRepositoryMongo) DeleteComparison(
+func (repo *ComparisonRepositoryMongo) DeleteComparison(
 	ctx context.Context,
 	id string,
 ) error {

@@ -11,7 +11,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-type customOptionRepositoryMongo struct {
+type CustomOptionRepositoryMongo struct {
 	customOptionsColl *mongo.Collection
 }
 
@@ -20,13 +20,13 @@ type customOptionMongo struct {
 	Name string `bson:"name"`
 }
 
-func NewCustomOptionRepositoryMongo(client *mongo.Client) *customOptionRepositoryMongo {
-	return &customOptionRepositoryMongo{
+func NewCustomOptionRepositoryMongo(client *mongo.Client) *CustomOptionRepositoryMongo {
+	return &CustomOptionRepositoryMongo{
 		customOptionsColl: client.Database("database").Collection("custom_options"),
 	}
 }
 
-func (repo *customOptionRepositoryMongo) CreateCustomOption(
+func (repo *CustomOptionRepositoryMongo) CreateCustomOption(
 	ctx context.Context,
 	customOption domain.CustomOption,
 ) error {
@@ -46,7 +46,7 @@ func (repo *customOptionRepositoryMongo) CreateCustomOption(
 	return nil
 }
 
-func (repo *customOptionRepositoryMongo) GetCustomOptionById(
+func (repo *CustomOptionRepositoryMongo) GetCustomOptionById(
 	ctx context.Context,
 	id string,
 ) (domain.CustomOption, error) {
@@ -67,7 +67,7 @@ func (repo *customOptionRepositoryMongo) GetCustomOptionById(
 	return toDomainCustomOption(com), nil
 }
 
-func (repo *customOptionRepositoryMongo) GetCustomOptions(
+func (repo *CustomOptionRepositoryMongo) GetCustomOptions(
 	ctx context.Context,
 	filter domain.CustomOptionFilter,
 ) ([]domain.CustomOption, error) {
@@ -99,7 +99,7 @@ func (repo *customOptionRepositoryMongo) GetCustomOptions(
 	return customOptions, nil
 }
 
-func (repo *customOptionRepositoryMongo) UpdateCustomOption(
+func (repo *CustomOptionRepositoryMongo) UpdateCustomOption(
 	ctx context.Context,
 	customOption domain.CustomOption,
 ) error {
@@ -127,7 +127,7 @@ func (repo *customOptionRepositoryMongo) UpdateCustomOption(
 	return nil
 }
 
-func (repo *customOptionRepositoryMongo) DeleteCustomOption(
+func (repo *CustomOptionRepositoryMongo) DeleteCustomOption(
 	ctx context.Context,
 	id string,
 ) error {

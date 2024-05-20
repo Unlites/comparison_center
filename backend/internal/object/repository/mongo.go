@@ -12,12 +12,12 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-type objectRepositoryMongo struct {
+type ObjectRepositoryMongo struct {
 	objectsColl *mongo.Collection
 }
 
-func NewObjectRepositoryMongo(client *mongo.Client) *objectRepositoryMongo {
-	return &objectRepositoryMongo{
+func NewObjectRepositoryMongo(client *mongo.Client) *ObjectRepositoryMongo {
+	return &ObjectRepositoryMongo{
 		objectsColl: client.Database("database").Collection("objects"),
 	}
 }
@@ -33,7 +33,7 @@ type objectMongo struct {
 	ComparisonId string    `bson:"comparison_id"`
 }
 
-func (repo *objectRepositoryMongo) GetObjects(
+func (repo *ObjectRepositoryMongo) GetObjects(
 	ctx context.Context,
 	filter domain.ObjectFilter,
 ) ([]domain.Object, error) {
@@ -73,7 +73,7 @@ func (repo *objectRepositoryMongo) GetObjects(
 	return objects, nil
 }
 
-func (repo *objectRepositoryMongo) GetObjectById(
+func (repo *ObjectRepositoryMongo) GetObjectById(
 	ctx context.Context,
 	id string,
 ) (domain.Object, error) {
@@ -94,7 +94,7 @@ func (repo *objectRepositoryMongo) GetObjectById(
 	return toDomainObject(obj), nil
 }
 
-func (repo *objectRepositoryMongo) CreateObject(
+func (repo *ObjectRepositoryMongo) CreateObject(
 	ctx context.Context,
 	object domain.Object,
 ) error {
@@ -106,7 +106,7 @@ func (repo *objectRepositoryMongo) CreateObject(
 	return nil
 }
 
-func (repo *objectRepositoryMongo) UpdateObject(
+func (repo *ObjectRepositoryMongo) UpdateObject(
 	ctx context.Context,
 	object domain.Object,
 ) error {
@@ -126,7 +126,7 @@ func (repo *objectRepositoryMongo) UpdateObject(
 	return nil
 }
 
-func (repo *objectRepositoryMongo) DeleteObject(
+func (repo *ObjectRepositoryMongo) DeleteObject(
 	ctx context.Context,
 	id string,
 ) error {

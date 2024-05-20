@@ -9,12 +9,12 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-type objectCustomOptionRepositoryMongo struct {
+type ObjectCustomOptionRepositoryMongo struct {
 	objectCustomOptionsColl *mongo.Collection
 }
 
-func NewObjectCustomOptionRepositoryMongo(client *mongo.Client) *objectCustomOptionRepositoryMongo {
-	return &objectCustomOptionRepositoryMongo{
+func NewObjectCustomOptionRepositoryMongo(client *mongo.Client) *ObjectCustomOptionRepositoryMongo {
+	return &ObjectCustomOptionRepositoryMongo{
 		objectCustomOptionsColl: client.Database("database").Collection("object_custom_options"),
 	}
 }
@@ -25,7 +25,7 @@ type objectCustomOptionMongo struct {
 	Value          string `bson:"value"`
 }
 
-func (repo *objectCustomOptionRepositoryMongo) GetObjectCustomOptionsByObjectId(
+func (repo *ObjectCustomOptionRepositoryMongo) GetObjectCustomOptionsByObjectId(
 	ctx context.Context,
 	objectId string,
 ) ([]domain.ObjectCustomOption, error) {
@@ -47,7 +47,7 @@ func (repo *objectCustomOptionRepositoryMongo) GetObjectCustomOptionsByObjectId(
 	return objCustomOptions, nil
 }
 
-func (repo *objectCustomOptionRepositoryMongo) AddObjectCustomOption(
+func (repo *ObjectCustomOptionRepositoryMongo) AddObjectCustomOption(
 	ctx context.Context,
 	objectCustomOption domain.ObjectCustomOption,
 ) error {
@@ -70,7 +70,7 @@ func (repo *objectCustomOptionRepositoryMongo) AddObjectCustomOption(
 	return nil
 }
 
-func (repo *objectCustomOptionRepositoryMongo) UpdateObjectCustomOption(
+func (repo *ObjectCustomOptionRepositoryMongo) UpdateObjectCustomOption(
 	ctx context.Context,
 	objectCustomOption domain.ObjectCustomOption,
 ) error {
