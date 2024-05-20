@@ -15,7 +15,7 @@ func NewObjectRepositoryMock() *ObjectRepositoryMock {
 	return &ObjectRepositoryMock{}
 }
 
-func (repo *ObjectRepositoryMock) GetObjects(
+func (repo *ObjectRepositoryMock) Objects(
 	ctx context.Context,
 	filter domain.ObjectFilter,
 ) ([]domain.Object, error) {
@@ -32,7 +32,7 @@ func (repo *ObjectRepositoryMock) GetObjects(
 	return objects, err
 }
 
-func (repo *ObjectRepositoryMock) GetObjectById(ctx context.Context, id string) (domain.Object, error) {
+func (repo *ObjectRepositoryMock) ObjectById(ctx context.Context, id string) (domain.Object, error) {
 	args := repo.Called(ctx, id)
 
 	ret, err := args.Get(0), args.Error(1)

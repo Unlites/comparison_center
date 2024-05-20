@@ -18,8 +18,8 @@ import (
 )
 
 type ComparisonUsecase interface {
-	GetComparisons(ctx context.Context, filter domain.ComparisonFilter) ([]domain.Comparison, error)
-	GetComparisonById(ctx context.Context, id string) (domain.Comparison, error)
+	Comparisons(ctx context.Context, filter domain.ComparisonFilter) ([]domain.Comparison, error)
+	ComparisonById(ctx context.Context, id string) (domain.Comparison, error)
 	UpdateComparison(ctx context.Context, id string, comparison domain.Comparison) error
 	CreateComparison(ctx context.Context, comparison domain.Comparison) error
 	DeleteComparison(ctx context.Context, id string) error
@@ -34,8 +34,8 @@ func NewComparisonHandler(uc ComparisonUsecase) *ComparisonHandler {
 	router := chi.NewRouter()
 	handler := &ComparisonHandler{router: router, uc: uc}
 
-	router.Get("/", handler.GetComparisons)
-	router.Get("/{id}", handler.GetComparisonById)
+	router.Get("/", handler.Comparisons)
+	router.Get("/{id}", handler.ComparisonById)
 	router.Post("/", handler.CreateComparison)
 	router.Put("/{id}", handler.UpdateComparison)
 	router.Delete("/{id}", handler.DeleteComparison)
@@ -54,7 +54,7 @@ type comparisonResponse struct {
 	CustomOptionIds []string  `json:"custom_option_ids"`
 }
 
-func (h *ComparisonHandler) GetComparisons(w http.ResponseWriter, r *http.Request) {
+func (h *ComparisonHandler) Comparisons(w http.ResponseWriter, r *http.Request) {
 	filter, err := h.getFilter(r.URL.Query())
 	if err != nil {
 		hu.FailureResponse(
@@ -65,7 +65,7 @@ func (h *ComparisonHandler) GetComparisons(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	comparisons, err := h.uc.GetComparisons(r.Context(), filter)
+	comparisons, err := h.uc.Comparisons(r.Context(), filter)
 	if err != nil {
 		hu.FailureResponse(
 			w, r,
@@ -83,10 +83,10 @@ func (h *ComparisonHandler) GetComparisons(w http.ResponseWriter, r *http.Reques
 	hu.SuccessResponse(w, r, comparisonResponses)
 }
 
-func (h *ComparisonHandler) GetComparisonById(w http.ResponseWriter, r *http.Request) {
+func (h *ComparisonHandler) ComparisonById(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 
-	comparison, err := h.uc.GetComparisonById(r.Context(), id)
+	comparison, err := h.uc.ComparisonById(r.Context(), id)
 	if err != nil {
 		status := http.StatusInternalServerError
 

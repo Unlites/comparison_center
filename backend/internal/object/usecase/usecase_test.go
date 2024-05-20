@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-func TestGetObjects(t *testing.T) {
+func TestObjects(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
 		objRepo := mocks.NewObjectRepositoryMock()
 		custOptObjRepo := mocks.NewObjectCustomOptionRepositoryMock()
@@ -50,10 +50,10 @@ func TestGetObjects(t *testing.T) {
 			OrderBy: "created",
 		}
 
-		objRepo.On("GetObjects", ctx, filter).Return(returnedObjects, nil)
-		custOptObjRepo.On("GetObjectCustomOptionsByObjectId", ctx, returnedObjects[0].Id).Return(returnedOptions, nil)
+		objRepo.On("Objects", ctx, filter).Return(returnedObjects, nil)
+		custOptObjRepo.On("ObjectCustomOptionsByObjectId", ctx, returnedObjects[0].Id).Return(returnedOptions, nil)
 
-		objects, err := uc.GetObjects(ctx, filter)
+		objects, err := uc.Objects(ctx, filter)
 
 		assert.NoError(t, err)
 		assert.Equal(t, returnedObjects, objects)
@@ -74,17 +74,17 @@ func TestGetObjects(t *testing.T) {
 			Offset: 0,
 		}
 
-		objRepo.On("GetObjects", ctx, filter).Return(nil, assert.AnError)
-		objects, err := uc.GetObjects(ctx, filter)
+		objRepo.On("Objects", ctx, filter).Return(nil, assert.AnError)
+		objects, err := uc.Objects(ctx, filter)
 
 		assert.Error(t, err)
 		assert.Nil(t, objects)
-		custOptObjRepo.AssertNotCalled(t, "GetObjectCustomOptionsByObjectId")
+		custOptObjRepo.AssertNotCalled(t, "ObjectCustomOptionsByObjectId")
 		objRepo.AssertExpectations(t)
 	})
 }
 
-func TestGetObjectById(t *testing.T) {
+func TestObjectById(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
 		objRepo := mocks.NewObjectRepositoryMock()
 		custOptObjRepo := mocks.NewObjectCustomOptionRepositoryMock()
@@ -121,10 +121,10 @@ func TestGetObjectById(t *testing.T) {
 		ctx := context.Background()
 		id := "231934sadas9123deqw"
 
-		objRepo.On("GetObjectById", ctx, id).Return(returnedObject, nil)
-		custOptObjRepo.On("GetObjectCustomOptionsByObjectId", ctx, returnedObject.Id).Return(returnedOptions, nil)
+		objRepo.On("ObjectById", ctx, id).Return(returnedObject, nil)
+		custOptObjRepo.On("ObjectCustomOptionsByObjectId", ctx, returnedObject.Id).Return(returnedOptions, nil)
 
-		object, err := uc.GetObjectById(ctx, id)
+		object, err := uc.ObjectById(ctx, id)
 
 		assert.NoError(t, err)
 		assert.Equal(t, returnedObjectWithOptions, object)
@@ -142,14 +142,14 @@ func TestGetObjectById(t *testing.T) {
 		ctx := context.Background()
 		id := "213213ewrwe9423432"
 
-		objRepo.On("GetObjectById", ctx, id).Return(nil, domain.ErrNotFound)
+		objRepo.On("ObjectById", ctx, id).Return(nil, domain.ErrNotFound)
 
-		object, err := uc.GetObjectById(ctx, id)
+		object, err := uc.ObjectById(ctx, id)
 
 		assert.Error(t, err)
 		assert.Empty(t, object)
 		objRepo.AssertExpectations(t)
-		custOptObjRepo.AssertNotCalled(t, "GetObjectCustomOptionsByObjectId")
+		custOptObjRepo.AssertNotCalled(t, "ObjectCustomOptionsByObjectId")
 	})
 }
 
@@ -274,10 +274,10 @@ func TestUpdateObject(t *testing.T) {
 
 		ctx := context.Background()
 
-		objRepo.On("GetObjectById", ctx, id).Return(returnedOnGetObject, nil)
+		objRepo.On("ObjectById", ctx, id).Return(returnedOnGetObject, nil)
 		objRepo.On("UpdateObject", ctx, changedObject).Return(nil)
 
-		custOptObjRepo.On("GetObjectCustomOptionsByObjectId", ctx, returnedOnGetObject.Id).
+		custOptObjRepo.On("ObjectCustomOptionsByObjectId", ctx, returnedOnGetObject.Id).
 			Return(returnedOnGetObject.ObjectCustomOptions, nil)
 
 		custOptObjRepo.On("UpdateObjectCustomOption", ctx, inputObject.ObjectCustomOptions[0]).Return(nil)
@@ -315,12 +315,12 @@ func TestUpdateObject(t *testing.T) {
 
 		ctx := context.Background()
 
-		objRepo.On("GetObjectById", ctx, id).Return(nil, assert.AnError)
+		objRepo.On("ObjectById", ctx, id).Return(nil, assert.AnError)
 
 		err := uc.UpdateObject(ctx, id, inputObject)
 
 		assert.Error(t, err)
-		custOptObjRepo.AssertNotCalled(t, "GetObjectCustomOptionsByObjectId")
+		custOptObjRepo.AssertNotCalled(t, "ObjectCustomOptionsByObjectId")
 		objRepo.AssertNotCalled(t, "UpdateObject")
 		objRepo.AssertNotCalled(t, "UpdateObjectCustomOption")
 		custOptObjRepo.AssertExpectations(t)
@@ -395,7 +395,7 @@ func TestSetObjectPhotoPath(t *testing.T) {
 
 		ctx := context.Background()
 
-		objRepo.On("GetObjectById", ctx, id).Return(object, nil)
+		objRepo.On("ObjectById", ctx, id).Return(object, nil)
 		objRepo.On("UpdateObject", ctx, changedObject).Return(nil)
 
 		err := uc.SetObjectPhotoPath(ctx, id, path)
@@ -415,12 +415,12 @@ func TestSetObjectPhotoPath(t *testing.T) {
 
 		ctx := context.Background()
 
-		objRepo.On("GetObjectById", ctx, id).Return(nil, assert.AnError)
+		objRepo.On("ObjectById", ctx, id).Return(nil, assert.AnError)
 
 		err := uc.SetObjectPhotoPath(ctx, id, path)
 
 		assert.Error(t, err)
-		custOptObjRepo.AssertNotCalled(t, "GetObjectCustomOptionsByObjectId")
+		custOptObjRepo.AssertNotCalled(t, "ObjectCustomOptionsByObjectId")
 		objRepo.AssertNotCalled(t, "UpdateObject")
 	})
 }

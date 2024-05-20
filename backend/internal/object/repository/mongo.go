@@ -33,7 +33,7 @@ type objectMongo struct {
 	ComparisonId string    `bson:"comparison_id"`
 }
 
-func (repo *ObjectRepositoryMongo) GetObjects(
+func (repo *ObjectRepositoryMongo) Objects(
 	ctx context.Context,
 	filter domain.ObjectFilter,
 ) ([]domain.Object, error) {
@@ -73,7 +73,7 @@ func (repo *ObjectRepositoryMongo) GetObjects(
 	return objects, nil
 }
 
-func (repo *ObjectRepositoryMongo) GetObjectById(
+func (repo *ObjectRepositoryMongo) ObjectById(
 	ctx context.Context,
 	id string,
 ) (domain.Object, error) {

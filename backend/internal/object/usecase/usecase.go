@@ -16,15 +16,15 @@ type ObjectUsecase struct {
 }
 
 type ObjectRepository interface {
-	GetObjects(ctx context.Context, filter domain.ObjectFilter) ([]domain.Object, error)
-	GetObjectById(ctx context.Context, id string) (domain.Object, error)
+	Objects(ctx context.Context, filter domain.ObjectFilter) ([]domain.Object, error)
+	ObjectById(ctx context.Context, id string) (domain.Object, error)
 	UpdateObject(ctx context.Context, object domain.Object) error
 	CreateObject(ctx context.Context, object domain.Object) error
 	DeleteObject(ctx context.Context, id string) error
 }
 
 type ObjectCustomOptionRepository interface {
-	GetObjectCustomOptionsByObjectId(ctx context.Context, objectId string) ([]domain.ObjectCustomOption, error)
+	ObjectCustomOptionsByObjectId(ctx context.Context, objectId string) ([]domain.ObjectCustomOption, error)
 	AddObjectCustomOption(ctx context.Context, objectCustomOption domain.ObjectCustomOption) error
 	UpdateObjectCustomOption(ctx context.Context, objectCustomOption domain.ObjectCustomOption) error
 }
@@ -45,17 +45,17 @@ func NewObjectUsecase(
 	}
 }
 
-func (uc *ObjectUsecase) GetObjects(
+func (uc *ObjectUsecase) Objects(
 	ctx context.Context,
 	filter domain.ObjectFilter,
 ) ([]domain.Object, error) {
-	objects, err := uc.objRepo.GetObjects(ctx, filter)
+	objects, err := uc.objRepo.Objects(ctx, filter)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get objects - %w", err)
 	}
 
 	for i, obj := range objects {
-		options, err := uc.custOptObjRepo.GetObjectCustomOptionsByObjectId(ctx, obj.Id)
+		options, err := uc.custOptObjRepo.ObjectCustomOptionsByObjectId(ctx, obj.Id)
 		if err != nil {
 			return nil, fmt.Errorf("failed to get custom options - %w", err)
 		}
@@ -66,16 +66,16 @@ func (uc *ObjectUsecase) GetObjects(
 	return objects, nil
 }
 
-func (uc *ObjectUsecase) GetObjectById(
+func (uc *ObjectUsecase) ObjectById(
 	ctx context.Context,
 	id string,
 ) (domain.Object, error) {
-	object, err := uc.objRepo.GetObjectById(ctx, id)
+	object, err := uc.objRepo.ObjectById(ctx, id)
 	if err != nil {
 		return domain.Object{}, fmt.Errorf("failed to get object - %w", err)
 	}
 
-	options, err := uc.custOptObjRepo.GetObjectCustomOptionsByObjectId(ctx, object.Id)
+	options, err := uc.custOptObjRepo.ObjectCustomOptionsByObjectId(ctx, object.Id)
 	if err != nil {
 		return domain.Object{}, fmt.Errorf("failed to get custom options - %w", err)
 	}
@@ -90,7 +90,7 @@ func (uc *ObjectUsecase) UpdateObject(
 	id string,
 	inputObject domain.Object,
 ) error {
-	existingObject, err := uc.objRepo.GetObjectById(ctx, id)
+	existingObject, err := uc.objRepo.ObjectById(ctx, id)
 	if err != nil {
 		return fmt.Errorf("failed to get existing object - %w", err)
 	}
@@ -104,7 +104,7 @@ func (uc *ObjectUsecase) UpdateObject(
 		return fmt.Errorf("failed to update object - %w", err)
 	}
 
-	existingObjectOptions, err := uc.custOptObjRepo.GetObjectCustomOptionsByObjectId(ctx, existingObject.Id)
+	existingObjectOptions, err := uc.custOptObjRepo.ObjectCustomOptionsByObjectId(ctx, existingObject.Id)
 	if err != nil {
 		return fmt.Errorf("failed to get existing custom options - %w", err)
 	}
@@ -152,7 +152,7 @@ func (uc *ObjectUsecase) DeleteObject(ctx context.Context, id string) error {
 }
 
 func (uc *ObjectUsecase) SetObjectPhotoPath(ctx context.Context, id, path string) error {
-	object, err := uc.objRepo.GetObjectById(ctx, id)
+	object, err := uc.objRepo.ObjectById(ctx, id)
 	if err != nil {
 		return fmt.Errorf("failed to get object - %w", err)
 	}

@@ -14,8 +14,8 @@ type ComparisonUsecase struct {
 }
 
 type ComparisonRepository interface {
-	GetComparisons(ctx context.Context, filter domain.ComparisonFilter) ([]domain.Comparison, error)
-	GetComparisonById(ctx context.Context, id string) (domain.Comparison, error)
+	Comparisons(ctx context.Context, filter domain.ComparisonFilter) ([]domain.Comparison, error)
+	ComparisonById(ctx context.Context, id string) (domain.Comparison, error)
 	UpdateComparison(ctx context.Context, comparison domain.Comparison) error
 	CreateComparison(ctx context.Context, comparison domain.Comparison) error
 	DeleteComparison(ctx context.Context, id string) error
@@ -35,11 +35,11 @@ func NewComparisonUsecase(
 	}
 }
 
-func (uc *ComparisonUsecase) GetComparisons(
+func (uc *ComparisonUsecase) Comparisons(
 	ctx context.Context,
 	filter domain.ComparisonFilter,
 ) ([]domain.Comparison, error) {
-	comparisons, err := uc.repo.GetComparisons(ctx, filter)
+	comparisons, err := uc.repo.Comparisons(ctx, filter)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get comparisons - %w", err)
 	}
@@ -47,11 +47,11 @@ func (uc *ComparisonUsecase) GetComparisons(
 	return comparisons, nil
 }
 
-func (uc *ComparisonUsecase) GetComparisonById(
+func (uc *ComparisonUsecase) ComparisonById(
 	ctx context.Context,
 	id string,
 ) (domain.Comparison, error) {
-	comparison, err := uc.repo.GetComparisonById(ctx, id)
+	comparison, err := uc.repo.ComparisonById(ctx, id)
 	if err != nil {
 		return domain.Comparison{}, fmt.Errorf("failed to get comparison - %w", err)
 	}
@@ -64,7 +64,7 @@ func (uc *ComparisonUsecase) UpdateComparison(
 	id string,
 	comparison domain.Comparison,
 ) error {
-	existingComparison, err := uc.repo.GetComparisonById(ctx, id)
+	existingComparison, err := uc.repo.ComparisonById(ctx, id)
 	if err != nil {
 		return fmt.Errorf("failed to get existing comparison - %w", err)
 	}

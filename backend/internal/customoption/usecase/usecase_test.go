@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestGetCustomOptions(t *testing.T) {
+func TestCustomOptions(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
 		repo := mocks.NewCustomOptionRepositoryMock()
 		generator := mocks.NewMockGenerator()
@@ -33,9 +33,9 @@ func TestGetCustomOptions(t *testing.T) {
 			},
 		}
 
-		repo.On("GetCustomOptions", ctx, filter).Return(returnedCustomOptions, nil)
+		repo.On("CustomOptions", ctx, filter).Return(returnedCustomOptions, nil)
 
-		customOptions, err := uc.GetCustomOptions(ctx, filter)
+		customOptions, err := uc.CustomOptions(ctx, filter)
 
 		assert.NoError(t, err)
 		assert.Equal(t, customOptions, returnedCustomOptions)
@@ -54,9 +54,9 @@ func TestGetCustomOptions(t *testing.T) {
 			Offset: 0,
 		}
 
-		repo.On("GetCustomOptions", ctx, filter).Return(nil, assert.AnError)
+		repo.On("CustomOptions", ctx, filter).Return(nil, assert.AnError)
 
-		customOptions, err := uc.GetCustomOptions(ctx, filter)
+		customOptions, err := uc.CustomOptions(ctx, filter)
 
 		assert.Nil(t, customOptions)
 		assert.Error(t, err)
@@ -143,7 +143,7 @@ func TestDeleteCustomOption(t *testing.T) {
 	})
 }
 
-func TestGetCustomOptionById(t *testing.T) {
+func TestCustomOptionById(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
 		repo := mocks.NewCustomOptionRepositoryMock()
 		generator := mocks.NewMockGenerator()
@@ -158,9 +158,9 @@ func TestGetCustomOptionById(t *testing.T) {
 			Name: "Speed",
 		}
 
-		repo.On("GetCustomOptionById", ctx, id).Return(returnedCustomOption, nil)
+		repo.On("CustomOptionById", ctx, id).Return(returnedCustomOption, nil)
 
-		customOption, err := uc.GetCustomOptionById(ctx, id)
+		customOption, err := uc.CustomOptionById(ctx, id)
 
 		assert.NoError(t, err)
 		assert.Equal(t, returnedCustomOption, customOption)
@@ -177,9 +177,9 @@ func TestGetCustomOptionById(t *testing.T) {
 
 		id := "190324fdsjfn123213"
 
-		repo.On("GetCustomOptionById", ctx, id).Return(domain.CustomOption{}, assert.AnError)
+		repo.On("CustomOptionById", ctx, id).Return(domain.CustomOption{}, assert.AnError)
 
-		customOption, err := uc.GetCustomOptionById(ctx, id)
+		customOption, err := uc.CustomOptionById(ctx, id)
 
 		assert.Error(t, err)
 		assert.Empty(t, customOption)

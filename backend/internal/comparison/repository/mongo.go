@@ -29,7 +29,7 @@ func NewComparisonRepositoryMongo(client *mongo.Client) *ComparisonRepositoryMon
 	}
 }
 
-func (repo *ComparisonRepositoryMongo) GetComparisons(
+func (repo *ComparisonRepositoryMongo) Comparisons(
 	ctx context.Context,
 	filter domain.ComparisonFilter,
 ) ([]domain.Comparison, error) {
@@ -56,7 +56,7 @@ func (repo *ComparisonRepositoryMongo) GetComparisons(
 	return comparisons, nil
 }
 
-func (repo *ComparisonRepositoryMongo) GetComparisonById(
+func (repo *ComparisonRepositoryMongo) ComparisonById(
 	ctx context.Context,
 	id string,
 ) (domain.Comparison, error) {

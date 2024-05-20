@@ -25,7 +25,7 @@ type objectCustomOptionMongo struct {
 	Value          string `bson:"value"`
 }
 
-func (repo *ObjectCustomOptionRepositoryMongo) GetObjectCustomOptionsByObjectId(
+func (repo *ObjectCustomOptionRepositoryMongo) ObjectCustomOptionsByObjectId(
 	ctx context.Context,
 	objectId string,
 ) ([]domain.ObjectCustomOption, error) {

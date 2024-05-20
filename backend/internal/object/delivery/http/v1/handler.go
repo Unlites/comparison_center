@@ -22,8 +22,8 @@ import (
 )
 
 type ObjectUsecase interface {
-	GetObjects(ctx context.Context, filter domain.ObjectFilter) ([]domain.Object, error)
-	GetObjectById(ctx context.Context, id string) (domain.Object, error)
+	Objects(ctx context.Context, filter domain.ObjectFilter) ([]domain.Object, error)
+	ObjectById(ctx context.Context, id string) (domain.Object, error)
 	UpdateObject(ctx context.Context, id string, object domain.Object) error
 	CreateObject(ctx context.Context, object domain.Object) (string, error)
 	DeleteObject(ctx context.Context, id string) error
@@ -46,8 +46,8 @@ func NewObjectHandler(uc ObjectUsecase, photosDir string, maxSize int64) *Object
 		uc:            uc,
 	}
 
-	router.Get("/", handler.GetObjects)
-	router.Get("/{id}", handler.GetObjectById)
+	router.Get("/", handler.Objects)
+	router.Get("/{id}", handler.ObjectById)
 	router.Post("/", handler.CreateObject)
 	router.Put("/{id}", handler.UpdateObject)
 	router.Delete("/{id}", handler.DeleteObject)
@@ -73,7 +73,7 @@ type objectResponse struct {
 	CustomOptions []map[string]string `json:"custom_options"`
 }
 
-func (h *ObjectHandler) GetObjects(w http.ResponseWriter, r *http.Request) {
+func (h *ObjectHandler) Objects(w http.ResponseWriter, r *http.Request) {
 	filter, err := h.getFilter(r.URL.Query())
 	if err != nil {
 		hu.FailureResponse(
@@ -84,7 +84,7 @@ func (h *ObjectHandler) GetObjects(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	objects, err := h.uc.GetObjects(r.Context(), filter)
+	objects, err := h.uc.Objects(r.Context(), filter)
 	if err != nil {
 		hu.FailureResponse(
 			w, r,
@@ -102,10 +102,10 @@ func (h *ObjectHandler) GetObjects(w http.ResponseWriter, r *http.Request) {
 	hu.SuccessResponse(w, r, objectResponses)
 }
 
-func (h *ObjectHandler) GetObjectById(w http.ResponseWriter, r *http.Request) {
+func (h *ObjectHandler) ObjectById(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 
-	object, err := h.uc.GetObjectById(r.Context(), id)
+	object, err := h.uc.ObjectById(r.Context(), id)
 	if err != nil {
 		status := http.StatusInternalServerError
 
@@ -380,7 +380,7 @@ func (h *ObjectHandler) UploadObjectPhoto(w http.ResponseWriter, r *http.Request
 func (h *ObjectHandler) GetObjectPhoto(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 
-	object, err := h.uc.GetObjectById(r.Context(), id)
+	object, err := h.uc.ObjectById(r.Context(), id)
 	if err != nil {
 		status := http.StatusInternalServerError
 

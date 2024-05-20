@@ -15,7 +15,7 @@ func NewComparisonRepositoryMock() *ComparisonRepositoryMock {
 	return &ComparisonRepositoryMock{}
 }
 
-func (repo *ComparisonRepositoryMock) GetComparisons(
+func (repo *ComparisonRepositoryMock) Comparisons(
 	ctx context.Context,
 	filter domain.ComparisonFilter,
 ) ([]domain.Comparison, error) {
@@ -32,7 +32,7 @@ func (repo *ComparisonRepositoryMock) GetComparisons(
 	return comparisons, err
 }
 
-func (repo *ComparisonRepositoryMock) GetComparisonById(
+func (repo *ComparisonRepositoryMock) ComparisonById(
 	ctx context.Context,
 	id string,
 ) (domain.Comparison, error) {

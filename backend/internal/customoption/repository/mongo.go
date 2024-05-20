@@ -46,7 +46,7 @@ func (repo *CustomOptionRepositoryMongo) CreateCustomOption(
 	return nil
 }
 
-func (repo *CustomOptionRepositoryMongo) GetCustomOptionById(
+func (repo *CustomOptionRepositoryMongo) CustomOptionById(
 	ctx context.Context,
 	id string,
 ) (domain.CustomOption, error) {
@@ -67,7 +67,7 @@ func (repo *CustomOptionRepositoryMongo) GetCustomOptionById(
 	return toDomainCustomOption(com), nil
 }
 
-func (repo *CustomOptionRepositoryMongo) GetCustomOptions(
+func (repo *CustomOptionRepositoryMongo) CustomOptions(
 	ctx context.Context,
 	filter domain.CustomOptionFilter,
 ) ([]domain.CustomOption, error) {

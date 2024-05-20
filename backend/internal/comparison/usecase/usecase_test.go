@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-func TestGetComparisons(t *testing.T) {
+func TestComparisons(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
 		repo := mocks.NewComparisonRepositoryMock()
 		generator := mocks.NewMockGenerator()
@@ -39,9 +39,9 @@ func TestGetComparisons(t *testing.T) {
 			Offset: 0,
 		}
 
-		repo.On("GetComparisons", ctx, filter).Return(returnedComparisons, nil)
+		repo.On("Comparisons", ctx, filter).Return(returnedComparisons, nil)
 
-		comparisons, err := uc.GetComparisons(ctx, filter)
+		comparisons, err := uc.Comparisons(ctx, filter)
 
 		assert.NoError(t, err)
 		assert.Equal(t, returnedComparisons, comparisons)
@@ -59,9 +59,9 @@ func TestGetComparisons(t *testing.T) {
 			Offset: 0,
 		}
 
-		repo.On("GetComparisons", ctx, filter).Return(nil, assert.AnError)
+		repo.On("Comparisons", ctx, filter).Return(nil, assert.AnError)
 
-		comparisons, err := uc.GetComparisons(ctx, filter)
+		comparisons, err := uc.Comparisons(ctx, filter)
 
 		assert.Error(t, err)
 		assert.Nil(t, comparisons)
@@ -69,7 +69,7 @@ func TestGetComparisons(t *testing.T) {
 	})
 }
 
-func TestGetComparisonById(t *testing.T) {
+func TestComparisonById(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
 		repo := mocks.NewComparisonRepositoryMock()
 		generator := mocks.NewMockGenerator()
@@ -85,9 +85,9 @@ func TestGetComparisonById(t *testing.T) {
 		ctx := context.Background()
 		id := "85434230werhuhi123912304"
 
-		repo.On("GetComparisonById", ctx, id).Return(returnedComparison, nil)
+		repo.On("ComparisonById", ctx, id).Return(returnedComparison, nil)
 
-		comparison, err := uc.GetComparisonById(ctx, id)
+		comparison, err := uc.ComparisonById(ctx, id)
 
 		assert.NoError(t, err)
 		assert.Equal(t, returnedComparison, comparison)
@@ -102,9 +102,9 @@ func TestGetComparisonById(t *testing.T) {
 		ctx := context.Background()
 		id := "213213ewrwe9423432"
 
-		repo.On("GetComparisonById", ctx, id).Return(nil, domain.ErrNotFound)
+		repo.On("ComparisonById", ctx, id).Return(nil, domain.ErrNotFound)
 
-		comparison, err := uc.GetComparisonById(ctx, id)
+		comparison, err := uc.ComparisonById(ctx, id)
 
 		assert.Error(t, err)
 		assert.Empty(t, comparison)
@@ -199,7 +199,7 @@ func TestUpdateComparison(t *testing.T) {
 			CustomOptionIds: inputComparison.CustomOptionIds,
 		}
 
-		repo.On("GetComparisonById", ctx, id).Return(returnedComparison, nil)
+		repo.On("ComparisonById", ctx, id).Return(returnedComparison, nil)
 		repo.On("UpdateComparison", ctx, changedComparison).Return(nil)
 
 		err := uc.UpdateComparison(ctx, id, inputComparison)
@@ -236,7 +236,7 @@ func TestUpdateComparison(t *testing.T) {
 			CustomOptionIds: inputComparison.CustomOptionIds,
 		}
 
-		repo.On("GetComparisonById", ctx, id).Return(returnedComparison, nil)
+		repo.On("ComparisonById", ctx, id).Return(returnedComparison, nil)
 		repo.On("UpdateComparison", ctx, changedComparison).Return(assert.AnError)
 
 		err := uc.UpdateComparison(ctx, id, inputComparison)

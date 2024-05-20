@@ -13,8 +13,8 @@ type CustomOptionUsecase struct {
 }
 
 type CustomOptionRepository interface {
-	GetCustomOptions(ctx context.Context, filter domain.CustomOptionFilter) ([]domain.CustomOption, error)
-	GetCustomOptionById(ctx context.Context, id string) (domain.CustomOption, error)
+	CustomOptions(ctx context.Context, filter domain.CustomOptionFilter) ([]domain.CustomOption, error)
+	CustomOptionById(ctx context.Context, id string) (domain.CustomOption, error)
 	UpdateCustomOption(ctx context.Context, customOption domain.CustomOption) error
 	CreateCustomOption(ctx context.Context, customOption domain.CustomOption) error
 	DeleteCustomOption(ctx context.Context, id string) error
@@ -31,11 +31,11 @@ func NewCustomOptionUsecase(
 	return &CustomOptionUsecase{repo: repo, generator: generator}
 }
 
-func (uc *CustomOptionUsecase) GetCustomOptions(
+func (uc *CustomOptionUsecase) CustomOptions(
 	ctx context.Context,
 	filter domain.CustomOptionFilter,
 ) ([]domain.CustomOption, error) {
-	customOptions, err := uc.repo.GetCustomOptions(ctx, filter)
+	customOptions, err := uc.repo.CustomOptions(ctx, filter)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get custom options - %w", err)
 	}
@@ -43,11 +43,11 @@ func (uc *CustomOptionUsecase) GetCustomOptions(
 	return customOptions, nil
 }
 
-func (uc *CustomOptionUsecase) GetCustomOptionById(
+func (uc *CustomOptionUsecase) CustomOptionById(
 	ctx context.Context,
 	id string,
 ) (domain.CustomOption, error) {
-	customOption, err := uc.repo.GetCustomOptionById(ctx, id)
+	customOption, err := uc.repo.CustomOptionById(ctx, id)
 	if err != nil {
 		return domain.CustomOption{}, fmt.Errorf("failed to get custom option - %w", err)
 	}
@@ -60,7 +60,7 @@ func (uc *CustomOptionUsecase) UpdateCustomOption(
 	id string,
 	customOption domain.CustomOption,
 ) error {
-	existingCustomOption, err := uc.repo.GetCustomOptionById(ctx, id)
+	existingCustomOption, err := uc.repo.CustomOptionById(ctx, id)
 	if err != nil {
 		return fmt.Errorf("failed to get existing custom option - %w", err)
 	}

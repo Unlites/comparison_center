@@ -15,7 +15,7 @@ func NewCustomOptionRepositoryMock() *CustomOptionRepositoryMock {
 	return &CustomOptionRepositoryMock{}
 }
 
-func (repo *CustomOptionRepositoryMock) GetCustomOptions(
+func (repo *CustomOptionRepositoryMock) CustomOptions(
 	ctx context.Context,
 	filter domain.CustomOptionFilter,
 ) ([]domain.CustomOption, error) {
@@ -32,7 +32,7 @@ func (repo *CustomOptionRepositoryMock) GetCustomOptions(
 	return customOptions, err
 }
 
-func (repo *CustomOptionRepositoryMock) GetCustomOptionById(
+func (repo *CustomOptionRepositoryMock) CustomOptionById(
 	ctx context.Context,
 	id string,
 ) (domain.CustomOption, error) {
