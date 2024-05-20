@@ -7,17 +7,9 @@ import (
 	"github.com/Unlites/comparison_center/backend/internal/domain"
 )
 
-type customOptionUsecase struct {
+type CustomOptionUsecase struct {
 	repo      CustomOptionRepository
 	generator IdGenerator
-}
-
-type CustomOptionUsecase interface {
-	GetCustomOptions(ctx context.Context, filter domain.CustomOptionFilter) ([]domain.CustomOption, error)
-	GetCustomOptionById(ctx context.Context, id string) (domain.CustomOption, error)
-	UpdateCustomOption(ctx context.Context, id string, customOption domain.CustomOption) error
-	CreateCustomOption(ctx context.Context, customOption domain.CustomOption) error
-	DeleteCustomOption(ctx context.Context, id string) error
 }
 
 type CustomOptionRepository interface {
@@ -35,11 +27,11 @@ type IdGenerator interface {
 func NewCustomOptionUsecase(
 	repo CustomOptionRepository,
 	generator IdGenerator,
-) *customOptionUsecase {
-	return &customOptionUsecase{repo: repo, generator: generator}
+) *CustomOptionUsecase {
+	return &CustomOptionUsecase{repo: repo, generator: generator}
 }
 
-func (uc *customOptionUsecase) GetCustomOptions(
+func (uc *CustomOptionUsecase) GetCustomOptions(
 	ctx context.Context,
 	filter domain.CustomOptionFilter,
 ) ([]domain.CustomOption, error) {
@@ -51,7 +43,7 @@ func (uc *customOptionUsecase) GetCustomOptions(
 	return customOptions, nil
 }
 
-func (uc *customOptionUsecase) GetCustomOptionById(
+func (uc *CustomOptionUsecase) GetCustomOptionById(
 	ctx context.Context,
 	id string,
 ) (domain.CustomOption, error) {
@@ -63,7 +55,7 @@ func (uc *customOptionUsecase) GetCustomOptionById(
 	return customOption, nil
 }
 
-func (uc *customOptionUsecase) UpdateCustomOption(
+func (uc *CustomOptionUsecase) UpdateCustomOption(
 	ctx context.Context,
 	id string,
 	customOption domain.CustomOption,
@@ -82,7 +74,7 @@ func (uc *customOptionUsecase) UpdateCustomOption(
 	return nil
 }
 
-func (uc *customOptionUsecase) CreateCustomOption(
+func (uc *CustomOptionUsecase) CreateCustomOption(
 	ctx context.Context,
 	customOption domain.CustomOption,
 ) error {
@@ -94,7 +86,7 @@ func (uc *customOptionUsecase) CreateCustomOption(
 	return nil
 }
 
-func (uc *customOptionUsecase) DeleteCustomOption(ctx context.Context, id string) error {
+func (uc *CustomOptionUsecase) DeleteCustomOption(ctx context.Context, id string) error {
 	if err := uc.repo.DeleteCustomOption(ctx, id); err != nil {
 		return fmt.Errorf("failed to delete custom option - %w", err)
 	}

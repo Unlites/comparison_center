@@ -8,17 +8,9 @@ import (
 	"github.com/Unlites/comparison_center/backend/internal/domain"
 )
 
-type comparisonUsecase struct {
+type ComparisonUsecase struct {
 	repo        ComparisonRepository
 	idGenerator IdGenerator
-}
-
-type ComparisonUsecase interface {
-	GetComparisons(ctx context.Context, filter domain.ComparisonFilter) ([]domain.Comparison, error)
-	GetComparisonById(ctx context.Context, id string) (domain.Comparison, error)
-	UpdateComparison(ctx context.Context, id string, comparison domain.Comparison) error
-	CreateComparison(ctx context.Context, comparison domain.Comparison) error
-	DeleteComparison(ctx context.Context, id string) error
 }
 
 type ComparisonRepository interface {
@@ -36,14 +28,14 @@ type IdGenerator interface {
 func NewComparisonUsecase(
 	repo ComparisonRepository,
 	idGenerator IdGenerator,
-) *comparisonUsecase {
-	return &comparisonUsecase{
+) *ComparisonUsecase {
+	return &ComparisonUsecase{
 		repo:        repo,
 		idGenerator: idGenerator,
 	}
 }
 
-func (uc *comparisonUsecase) GetComparisons(
+func (uc *ComparisonUsecase) GetComparisons(
 	ctx context.Context,
 	filter domain.ComparisonFilter,
 ) ([]domain.Comparison, error) {
@@ -55,7 +47,7 @@ func (uc *comparisonUsecase) GetComparisons(
 	return comparisons, nil
 }
 
-func (uc *comparisonUsecase) GetComparisonById(
+func (uc *ComparisonUsecase) GetComparisonById(
 	ctx context.Context,
 	id string,
 ) (domain.Comparison, error) {
@@ -67,7 +59,7 @@ func (uc *comparisonUsecase) GetComparisonById(
 	return comparison, nil
 }
 
-func (uc *comparisonUsecase) UpdateComparison(
+func (uc *ComparisonUsecase) UpdateComparison(
 	ctx context.Context,
 	id string,
 	comparison domain.Comparison,
@@ -87,7 +79,7 @@ func (uc *comparisonUsecase) UpdateComparison(
 	return nil
 }
 
-func (uc *comparisonUsecase) CreateComparison(
+func (uc *ComparisonUsecase) CreateComparison(
 	ctx context.Context,
 	comparison domain.Comparison,
 ) error {
@@ -101,7 +93,7 @@ func (uc *comparisonUsecase) CreateComparison(
 	return nil
 }
 
-func (uc *comparisonUsecase) DeleteComparison(ctx context.Context, id string) error {
+func (uc *ComparisonUsecase) DeleteComparison(ctx context.Context, id string) error {
 	if err := uc.repo.DeleteComparison(ctx, id); err != nil {
 		return fmt.Errorf("failed to delete comparison - %w", err)
 	}

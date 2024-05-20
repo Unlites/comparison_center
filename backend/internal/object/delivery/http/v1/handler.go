@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -12,7 +13,6 @@ import (
 	"time"
 
 	"github.com/Unlites/comparison_center/backend/internal/domain"
-	"github.com/Unlites/comparison_center/backend/internal/object/usecase"
 	hu "github.com/Unlites/comparison_center/backend/internal/utils/http"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
@@ -21,14 +21,23 @@ import (
 	"github.com/google/uuid"
 )
 
+type ObjectUsecase interface {
+	GetObjects(ctx context.Context, filter domain.ObjectFilter) ([]domain.Object, error)
+	GetObjectById(ctx context.Context, id string) (domain.Object, error)
+	UpdateObject(ctx context.Context, id string, object domain.Object) error
+	CreateObject(ctx context.Context, object domain.Object) (string, error)
+	DeleteObject(ctx context.Context, id string) error
+	SetObjectPhotoPath(ctx context.Context, id, path string) error
+}
+
 type ObjectHandler struct {
 	router        http.Handler
 	maxUploadSize int64
 	photosDir     string
-	uc            usecase.ObjectUsecase
+	uc            ObjectUsecase
 }
 
-func NewObjectHandler(uc usecase.ObjectUsecase, photosDir string, maxSize int64) *ObjectHandler {
+func NewObjectHandler(uc ObjectUsecase, photosDir string, maxSize int64) *ObjectHandler {
 	router := chi.NewRouter()
 	handler := &ObjectHandler{
 		router:        router,

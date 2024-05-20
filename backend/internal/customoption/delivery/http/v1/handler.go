@@ -1,13 +1,13 @@
 package v1
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
 	"strconv"
 
-	"github.com/Unlites/comparison_center/backend/internal/customoption/usecase"
 	"github.com/Unlites/comparison_center/backend/internal/domain"
 	hu "github.com/Unlites/comparison_center/backend/internal/utils/http"
 
@@ -16,12 +16,20 @@ import (
 	v "github.com/go-ozzo/ozzo-validation"
 )
 
-type CustomOptionHandler struct {
-	router http.Handler
-	uc     usecase.CustomOptionUsecase
+type CustomOptionUsecase interface {
+	GetCustomOptions(ctx context.Context, filter domain.CustomOptionFilter) ([]domain.CustomOption, error)
+	GetCustomOptionById(ctx context.Context, id string) (domain.CustomOption, error)
+	UpdateCustomOption(ctx context.Context, id string, customOption domain.CustomOption) error
+	CreateCustomOption(ctx context.Context, customOption domain.CustomOption) error
+	DeleteCustomOption(ctx context.Context, id string) error
 }
 
-func NewCustomOptionHandler(uc usecase.CustomOptionUsecase) *CustomOptionHandler {
+type CustomOptionHandler struct {
+	router http.Handler
+	uc     CustomOptionUsecase
+}
+
+func NewCustomOptionHandler(uc CustomOptionUsecase) *CustomOptionHandler {
 	router := chi.NewRouter()
 	handler := &CustomOptionHandler{router: router, uc: uc}
 

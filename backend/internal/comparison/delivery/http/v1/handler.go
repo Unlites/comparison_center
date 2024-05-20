@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -8,7 +9,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/Unlites/comparison_center/backend/internal/comparison/usecase"
 	"github.com/Unlites/comparison_center/backend/internal/domain"
 	hu "github.com/Unlites/comparison_center/backend/internal/utils/http"
 	"github.com/go-chi/chi/v5"
@@ -17,12 +17,20 @@ import (
 	"github.com/go-ozzo/ozzo-validation/is"
 )
 
-type ComparisonHandler struct {
-	router http.Handler
-	uc     usecase.ComparisonUsecase
+type ComparisonUsecase interface {
+	GetComparisons(ctx context.Context, filter domain.ComparisonFilter) ([]domain.Comparison, error)
+	GetComparisonById(ctx context.Context, id string) (domain.Comparison, error)
+	UpdateComparison(ctx context.Context, id string, comparison domain.Comparison) error
+	CreateComparison(ctx context.Context, comparison domain.Comparison) error
+	DeleteComparison(ctx context.Context, id string) error
 }
 
-func NewComparisonHandler(uc usecase.ComparisonUsecase) *ComparisonHandler {
+type ComparisonHandler struct {
+	router http.Handler
+	uc     ComparisonUsecase
+}
+
+func NewComparisonHandler(uc ComparisonUsecase) *ComparisonHandler {
 	router := chi.NewRouter()
 	handler := &ComparisonHandler{router: router, uc: uc}
 

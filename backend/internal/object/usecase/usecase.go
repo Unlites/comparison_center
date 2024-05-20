@@ -9,19 +9,10 @@ import (
 	"github.com/Unlites/comparison_center/backend/internal/domain"
 )
 
-type objectUsecase struct {
+type ObjectUsecase struct {
 	objRepo        ObjectRepository
 	custOptObjRepo ObjectCustomOptionRepository
 	generator      IdGenerator
-}
-
-type ObjectUsecase interface {
-	GetObjects(ctx context.Context, filter domain.ObjectFilter) ([]domain.Object, error)
-	GetObjectById(ctx context.Context, id string) (domain.Object, error)
-	UpdateObject(ctx context.Context, id string, object domain.Object) error
-	CreateObject(ctx context.Context, object domain.Object) (string, error)
-	DeleteObject(ctx context.Context, id string) error
-	SetObjectPhotoPath(ctx context.Context, id, path string) error
 }
 
 type ObjectRepository interface {
@@ -46,15 +37,15 @@ func NewObjectUsecase(
 	objRepo ObjectRepository,
 	custOptObjRepo ObjectCustomOptionRepository,
 	generator IdGenerator,
-) *objectUsecase {
-	return &objectUsecase{
+) *ObjectUsecase {
+	return &ObjectUsecase{
 		objRepo:        objRepo,
 		custOptObjRepo: custOptObjRepo,
 		generator:      generator,
 	}
 }
 
-func (uc *objectUsecase) GetObjects(
+func (uc *ObjectUsecase) GetObjects(
 	ctx context.Context,
 	filter domain.ObjectFilter,
 ) ([]domain.Object, error) {
@@ -75,7 +66,7 @@ func (uc *objectUsecase) GetObjects(
 	return objects, nil
 }
 
-func (uc *objectUsecase) GetObjectById(
+func (uc *ObjectUsecase) GetObjectById(
 	ctx context.Context,
 	id string,
 ) (domain.Object, error) {
@@ -94,7 +85,7 @@ func (uc *objectUsecase) GetObjectById(
 	return object, nil
 }
 
-func (uc *objectUsecase) UpdateObject(
+func (uc *ObjectUsecase) UpdateObject(
 	ctx context.Context,
 	id string,
 	inputObject domain.Object,
@@ -139,7 +130,7 @@ func (uc *objectUsecase) UpdateObject(
 	return nil
 }
 
-func (uc *objectUsecase) CreateObject(
+func (uc *ObjectUsecase) CreateObject(
 	ctx context.Context,
 	object domain.Object,
 ) (string, error) {
@@ -152,7 +143,7 @@ func (uc *objectUsecase) CreateObject(
 	return object.Id, nil
 }
 
-func (uc *objectUsecase) DeleteObject(ctx context.Context, id string) error {
+func (uc *ObjectUsecase) DeleteObject(ctx context.Context, id string) error {
 	if err := uc.objRepo.DeleteObject(ctx, id); err != nil {
 		return fmt.Errorf("failed to delete object - %w", err)
 	}
@@ -160,7 +151,7 @@ func (uc *objectUsecase) DeleteObject(ctx context.Context, id string) error {
 	return nil
 }
 
-func (uc *objectUsecase) SetObjectPhotoPath(ctx context.Context, id, path string) error {
+func (uc *ObjectUsecase) SetObjectPhotoPath(ctx context.Context, id, path string) error {
 	object, err := uc.objRepo.GetObjectById(ctx, id)
 	if err != nil {
 		return fmt.Errorf("failed to get object - %w", err)
