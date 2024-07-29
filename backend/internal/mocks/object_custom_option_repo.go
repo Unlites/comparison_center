@@ -15,7 +15,7 @@ func NewObjectCustomOptionRepositoryMock() *ObjectCustomOptionRepositoryMock {
 	return &ObjectCustomOptionRepositoryMock{}
 }
 
-func (repo *ObjectCustomOptionRepositoryMock) ObjectCustomOptionsByObjectId(
+func (repo *ObjectCustomOptionRepositoryMock) GetObjectCustomOptionsByObjectId(
 	ctx context.Context,
 	objectId string,
 ) ([]domain.ObjectCustomOption, error) {

@@ -6,10 +6,11 @@
         <input type="number" class="form-control my-1" placeholder="Rating" v-model="object.rating">
         <input type="text" class="form-control my-1" placeholder="Adventages" v-model="object.advs">
         <input type="text" class="form-control my-1" placeholder="Disadventages" v-model="object.disadvs">
-        <input v-for="customOption in customOptions" type="text" class="form-control my-1" :placeholder="customOption.name"
-            v-model="customOption.value">
+        <input v-for="(customOption, index) in customOptions" type="text" class="form-control my-1"
+            :placeholder="customOption.name" v-model="customOption['value']"
+            @change="fillObjectCustomOption(customOption)">
         <div>
-            <label for="objectPhoto my-2">Object photo:</label>
+            <label for=" objectPhoto my-2">Object photo:</label>
             <input type="file" class="form-control-file mx-2" id="objectPhoto"
                 @change="object.photo = $event.target.files[0]">
         </div>
@@ -44,12 +45,19 @@ onMounted(() => {
     if (props.operation === 'update') {
         formTitle.value = 'Update object'
         object.value = props.object
-        customOptions.value = props.object.custom_options
+        customOptions.value = JSON.parse(JSON.stringify(props.object.custom_options))
     } else {
         formTitle.value = 'New object'
-        customOptions.value = props.comparisonCustomOptions
+        customOptions.value = JSON.parse(JSON.stringify(props.comparisonCustomOptions))
     }
 })
+
+function fillObjectCustomOption(customOption) {
+    object.value.custom_options.push({
+        id: customOption.id,
+        value: customOption.value,
+    })
+}
 
 </script>
 

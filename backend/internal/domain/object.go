@@ -46,9 +46,10 @@ func NewObjectFilter(limit, offset int, orderBy, name, comparisonId string) (Obj
 	}
 
 	return ObjectFilter{
-		Limit:   limit,
-		Offset:  offset,
-		Name:    name,
-		OrderBy: orderBy,
+		Limit:        limit,
+		Offset:       offset,
+		Name:         name,
+		OrderBy:      orderBy,
+		ComparisonId: comparisonId,
 	}, nil
 }

@@ -43,10 +43,14 @@ const comparisonCustomOptions = ref([])
 const comparisonId = route.params.id
 
 onMounted(async () => {
+    await fetchInfo()
+})
+
+async function fetchInfo() {
     await fetchObjects()
     await fetchCustomOptions()
     await mapOptions()
-})
+}
 
 async function fetchObjects() {
     try {
@@ -126,7 +130,7 @@ async function update(object) {
         if (object.photo) {
             await uploadPhoto(object.id, object.photo)
         }
-        await fetchObjects()
+        await fetchInfo()
     } catch (e) {
         console.error(e);
         if (e.response?.data?.message) {
@@ -162,7 +166,7 @@ async function add(object) {
         if (object.photo) {
             await uploadPhoto(object.id, object.photo)
         }
-        await fetchObjects()
+        await fetchInfo()
     } catch (e) {
         console.error(e);
         if (e.response?.data?.message) {
